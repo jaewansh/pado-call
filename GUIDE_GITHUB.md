@@ -1,5 +1,7 @@
 # GitHub에 올리고 앱 확인하기
 
+> 이 저장소(jaewansh/pado-call)의 데모 주소: https://jaewansh.github.io/pado-call/
+
 이 저장소는 빌드된 앱이 `docs/` 폴더에 들어 있어서, GitHub에 올린 뒤 **Pages 설정 한 번**이면 누구나 주소로 앱을 열 수 있습니다. 서버나 GitHub Actions 설정은 필요 없습니다.
 
 ## 1. 저장소 만들기 (방법 A·C를 쓸 때)

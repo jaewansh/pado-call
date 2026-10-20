@@ -9,17 +9,17 @@
 
 ## 데모
 
-**웹 데모: https://&lt;GitHub아이디&gt;.github.io/pado-call/** — GitHub Pages를 켠 뒤 접속합니다. 올리는 방법과 확인 방법은 [GUIDE_GITHUB.md](GUIDE_GITHUB.md)에 정리했습니다.
+**웹 데모: https://jaewansh.github.io/pado-call/** — PC와 휴대폰 브라우저에서 바로 열립니다. 올리는 방법과 확인 방법은 [GUIDE_GITHUB.md](GUIDE_GITHUB.md)에 정리했습니다.
 
-| 화면 | 주소 (데모 주소 뒤에 붙임) |
+| 화면 | 바로가기 |
 |---|---|
-| 관광객 앱 · 공항 셔틀 / 지금 호출 | `#/call` |
-| 관광객 앱 · 혼잡 예측 지도 | `#/wave` |
-| 관광객 앱 · 내 여정(승차 코드) | `#/trips` |
-| 관제·예약 대시보드 (한국어) | `#/control` |
-| 수리모형 설명 | `#/model` |
+| 관광객 앱 · 공항 셔틀 / 지금 호출 | [jaewansh.github.io/pado-call/#/call](https://jaewansh.github.io/pado-call/#/call) |
+| 관광객 앱 · 혼잡 예측 지도 | [#/wave](https://jaewansh.github.io/pado-call/#/wave) |
+| 관광객 앱 · 내 여정(승차 코드) | [#/trips](https://jaewansh.github.io/pado-call/#/trips) |
+| 관제·예약 대시보드 (한국어) | [#/control](https://jaewansh.github.io/pado-call/#/control) |
+| 수리모형 설명 | [#/model](https://jaewansh.github.io/pado-call/#/model) |
 
-- 언어·시나리오를 주소로 지정할 수 있습니다: `?lang=en#/call`, `?lang=ja&day=cruise&t=1300#/wave` (lang = ko · en · ja · zhHans · zhHant, day = weekend · cruise · drone, t = 시각 HHMM)
+- 언어·시나리오를 주소로 지정할 수 있습니다: [`?lang=en#/call`](https://jaewansh.github.io/pado-call/?lang=en#/call), [`?lang=ja&day=cruise&t=1300#/wave`](https://jaewansh.github.io/pado-call/?lang=ja&day=cruise&t=1300#/wave) (lang = ko · en · ja · zhHans · zhHant, day = weekend · cruise · drone, t = 시각 HHMM)
 - 휴대폰 브라우저에서 열고 **홈 화면에 추가**하면 앱처럼 실행됩니다(PWA).
 - 모든 수요·예약·관측값은 **시연용 가상 데이터**이며, 계산은 서버 없이 브라우저에서 실행됩니다.
 

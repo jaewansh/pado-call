@@ -12,7 +12,7 @@ from .scenario import load_scenario
 
 app = FastAPI(title="PADO CALL reference engine", version="0.1.0",
               description="Virtual demo data only. DRT wait model: simplified generic form of the team's prior study [1].")
-DAYS = ("weekend", "cruise", "drone")
+DAYS = ("weekday", "weekend", "cruise", "drone")
 
 
 def _day(zone: str, day: str):

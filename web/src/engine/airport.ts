@@ -223,9 +223,10 @@ export const DEMO_SEED = 11;
 
 /** Synthetic bookings for a demo day: arrival and departure flight banks (virtual). */
 export function syntheticBookings(day: DayType, seed = DEMO_SEED): Booking[] {
-  const rand = mulberry32(seed + (day === 'cruise' ? 11 : day === 'drone' ? 23 : 0));
-  const nArr = day === 'cruise' ? 12 : day === 'drone' ? 16 : 14;
-  const nDep = day === 'cruise' ? 8 : 10;
+  const rand = mulberry32(seed + (day === 'cruise' ? 11 : day === 'drone' ? 23 : day === 'weekday' ? 5 : 0));
+  // weekdays: about 80% of the weekend bookings
+  const nArr = day === 'cruise' ? 12 : day === 'drone' ? 16 : day === 'weekday' ? 11 : 14;
+  const nDep = day === 'cruise' ? 8 : 10 - (day === 'weekday' ? 2 : 0);
   // arrival waves of the day (virtual) — the drone Saturday has a stronger afternoon wave
   const arrBanks = day === 'drone'
     ? [{ c: 9 * 60 + 40, s: 35, w: 0.25 }, { c: 12 * 60 + 40, s: 35, w: 0.2 }, { c: 15 * 60 + 30, s: 40, w: 0.35 }, { c: 19 * 60 + 30, s: 40, w: 0.2 }]

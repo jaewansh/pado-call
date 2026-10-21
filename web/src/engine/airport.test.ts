@@ -4,7 +4,7 @@ import {
 } from './airport';
 import type { DayType } from '../data/scenario';
 
-const DAYS: DayType[] = ['weekend', 'cruise', 'drone'];
+const DAYS: DayType[] = ['weekday', 'weekend', 'cruise', 'drone'];
 
 describe('airport gateway plan', () => {
   for (const day of DAYS) {

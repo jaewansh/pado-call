@@ -7,6 +7,7 @@ import { BrandMark } from './Widgets';
 import { Icon } from './Icon';
 
 export const DAY_LABEL: Record<DayType, { ko: string; en: string }> = {
+  weekday: { ko: '평일', en: 'Weekday' },
   weekend: { ko: '주말', en: 'Weekend' },
   cruise: { ko: '크루즈 입항일', en: 'Cruise day' },
   drone: { ko: '드론쇼 토요일', en: 'Drone-show Saturday' },

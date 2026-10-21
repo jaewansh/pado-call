@@ -12,7 +12,7 @@ from padocall.scenario import load_scenario
 
 REF = json.loads((Path(__file__).parent / "fixtures" / "reference.json").read_text(encoding="utf-8"))
 SC = load_scenario()
-DAYS = ("weekend", "cruise", "drone")
+DAYS = ("weekday", "weekend", "cruise", "drone")
 
 
 def test_geometry_and_cycle():

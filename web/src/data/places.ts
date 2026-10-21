@@ -41,7 +41,7 @@ const h24 = (start: number, shares: number[]): number[] => {
   const s = a.reduce((x: number, y: number) => x + y, 0);
   return a.map((v: number) => v / s);
 };
-const same = (p: number[]): Record<DayType, number[]> => ({ weekend: p, cruise: p, drone: p });
+const same = (p: number[]): Record<DayType, number[]> => ({ weekday: p, weekend: p, cruise: p, drone: p });
 
 const DAYTIME = h24(9, [0.07, 0.11, 0.13, 0.14, 0.14, 0.13, 0.12, 0.09, 0.07]);
 const ALLDAY = h24(10, [0.04, 0.06, 0.08, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.1, 0.1, 0.08]);
@@ -57,7 +57,7 @@ export const PLACES: Place[] = [
     short: { ko: '광안리', en: 'Gwangalli', ja: '広安里', zhHans: '广安里', zhHant: '廣安里' },
     scene: 'coast',
     pickup: { ko: '해변 중앙 광장, 파란 PADO CALL 표지판 앞', en: 'Central beach plaza, at the blue PADO CALL sign', ja: 'ビーチ中央広場、青いPADO CALLの看板前', zhHans: '海滩中央广场，蓝色 PADO CALL 标牌前', zhHant: '海灘中央廣場，藍色 PADO CALL 標牌前' },
-    crowd: { K: 9000, T: 110, daily: { weekend: 30000, cruise: 22000, drone: 52000 }, profile: { weekend: EVENING_BEACH, cruise: EVENING_BEACH, drone: DRONE_BEACH }, pop: 1.0 },
+    crowd: { K: 9000, T: 110, daily: { weekday: 19500, weekend: 30000, cruise: 22000, drone: 52000 }, profile: { weekday: EVENING_BEACH, weekend: EVENING_BEACH, cruise: EVENING_BEACH, drone: DRONE_BEACH }, pop: 1.0 },
   },
   {
     id: 'millak', zone: 'A', x: 150, y: 128, lat: 35.1552, lng: 129.1335, hub: false,
@@ -65,7 +65,7 @@ export const PLACES: Place[] = [
     short: { ko: '민락', en: 'Millak', ja: '民楽', zhHans: '民乐', zhHant: '民樂' },
     scene: 'coast',
     pickup: { ko: '공원 입구 버스정류장 옆', en: 'Next to the bus stop at the park entrance', ja: '公園入口のバス停の横', zhHans: '公园入口公交站旁', zhHant: '公園入口公車站旁' },
-    crowd: { K: 3200, T: 80, daily: { weekend: 9000, cruise: 6000, drone: 15000 }, profile: { weekend: EVENING_BEACH, cruise: EVENING_BEACH, drone: DRONE_BEACH }, pop: 0.55 },
+    crowd: { K: 3200, T: 80, daily: { weekday: 5800, weekend: 9000, cruise: 6000, drone: 15000 }, profile: { weekday: EVENING_BEACH, weekend: EVENING_BEACH, cruise: EVENING_BEACH, drone: DRONE_BEACH }, pop: 0.55 },
   },
   {
     id: 'centum', zone: 'A', x: 196, y: 64, lat: 35.169, lng: 129.13, hub: false,
@@ -73,7 +73,7 @@ export const PLACES: Place[] = [
     short: { ko: '센텀', en: 'Centum', ja: 'センタム', zhHans: 'Centum', zhHant: 'Centum' },
     scene: 'city',
     pickup: { ko: '백화점 정문 택시승강장 옆', en: 'Beside the taxi stand at the department store main gate', ja: '百貨店正門のタクシー乗り場の横', zhHans: '百货公司正门出租车站旁', zhHant: '百貨公司正門計程車站旁' },
-    crowd: { K: 9000, T: 100, daily: { weekend: 26000, cruise: 20000, drone: 26000 }, profile: same(ALLDAY), pop: 0.8 },
+    crowd: { K: 9000, T: 100, daily: { weekday: 16900, weekend: 26000, cruise: 20000, drone: 26000 }, profile: same(ALLDAY), pop: 0.8 },
   },
   {
     id: 'haeundae', zone: 'A', x: 270, y: 150, lat: 35.1592, lng: 129.1598, hub: true,
@@ -81,7 +81,7 @@ export const PLACES: Place[] = [
     short: { ko: '해운대', en: 'Haeundae', ja: '海雲台', zhHans: '海云台', zhHant: '海雲台' },
     scene: 'coast',
     pickup: { ko: '해변 입구 관광안내소 앞', en: 'In front of the tourist information center at the beach entrance', ja: 'ビーチ入口の観光案内所前', zhHans: '海滩入口旅游咨询处前', zhHant: '海灘入口旅遊服務中心前' },
-    crowd: { K: 12000, T: 110, daily: { weekend: 36000, cruise: 28000, drone: 37000 }, profile: same(EVENING_BEACH), pop: 1.0 },
+    crowd: { K: 12000, T: 110, daily: { weekday: 23400, weekend: 36000, cruise: 28000, drone: 37000 }, profile: same(EVENING_BEACH), pop: 1.0 },
   },
   {
     id: 'dongbaek', zone: 'A', x: 236, y: 196, lat: 35.155, lng: 129.1518, hub: false,
@@ -89,7 +89,7 @@ export const PLACES: Place[] = [
     short: { ko: '동백섬', en: 'Dongbaek', ja: '冬柏島', zhHans: '冬柏岛', zhHant: '冬柏島' },
     scene: 'coast',
     pickup: { ko: '동백섬 입구 주차장', en: 'Dongbaekseom entrance parking lot', ja: '冬柏島入口の駐車場', zhHans: '冬柏岛入口停车场', zhHant: '冬柏島入口停車場' },
-    crowd: { K: 2600, T: 60, daily: { weekend: 6500, cruise: 5000, drone: 6500 }, profile: same(DAYTIME), pop: 0.45 },
+    crowd: { K: 2600, T: 60, daily: { weekday: 4200, weekend: 6500, cruise: 5000, drone: 6500 }, profile: same(DAYTIME), pop: 0.45 },
   },
   {
     id: 'blueline', zone: 'A', x: 322, y: 112, lat: 35.1614, lng: 129.1694, hub: false,
@@ -97,7 +97,7 @@ export const PLACES: Place[] = [
     short: { ko: '블루라인', en: 'Blueline', ja: 'ブルーライン', zhHans: '蓝线公园', zhHant: '藍線公園' },
     scene: 'coast',
     pickup: { ko: '미포 정거장 매표소 앞', en: 'In front of the Mipo station ticket office', ja: '尾浦駅の切符売り場前', zhHans: '尾浦站售票处前', zhHant: '尾浦站售票處前' },
-    crowd: { K: 2200, T: 60, daily: { weekend: 7000, cruise: 5000, drone: 7000 }, profile: same(DAYTIME), pop: 0.6 },
+    crowd: { K: 2200, T: 60, daily: { weekday: 4600, weekend: 7000, cruise: 5000, drone: 7000 }, profile: same(DAYTIME), pop: 0.6 },
   },
   // ---------------------------------------------------------------- zone B
   {
@@ -113,7 +113,7 @@ export const PLACES: Place[] = [
     short: { ko: '남포', en: 'Nampo', ja: '南浦', zhHans: '南浦', zhHant: '南浦' },
     scene: 'city',
     pickup: { ko: '자갈치역 10번 출구 앞', en: 'Jagalchi Station exit 10', ja: 'チャガルチ駅10番出口前', zhHans: '札嘎其站10号出口前', zhHant: '札嘎其站10號出口前' },
-    crowd: { K: 5200, T: 90, daily: { weekend: 16000, cruise: 21000, drone: 16000 }, profile: { weekend: ALLDAY, cruise: CRUISE_SPOT, drone: ALLDAY }, pop: 1.0 },
+    crowd: { K: 5200, T: 90, daily: { weekday: 10400, weekend: 16000, cruise: 21000, drone: 16000 }, profile: { weekday: ALLDAY, weekend: ALLDAY, cruise: CRUISE_SPOT, drone: ALLDAY }, pop: 1.0 },
   },
   {
     id: 'gamcheon', zone: 'B', x: 54, y: 92, lat: 35.0978, lng: 129.0113, hub: false,
@@ -121,7 +121,7 @@ export const PLACES: Place[] = [
     short: { ko: '감천', en: 'Gamcheon', ja: '甘川', zhHans: '甘川', zhHant: '甘川' },
     scene: 'hill',
     pickup: { ko: '마을 입구 공영주차장(주거지 밖 승차)', en: 'Public parking at the village entrance (outside the residential area)', ja: '村入口の公営駐車場(住宅地の外で乗車)', zhHans: '村口公共停车场(在居民区外上车)', zhHant: '村口公共停車場(在住宅區外上車)' },
-    crowd: { K: 1500, T: 75, daily: { weekend: 9000, cruise: 11500, drone: 9000 }, profile: { weekend: DAYTIME, cruise: CRUISE_SPOT, drone: DAYTIME }, pop: 0.95 },
+    crowd: { K: 1500, T: 75, daily: { weekday: 5800, weekend: 9000, cruise: 11500, drone: 9000 }, profile: { weekday: DAYTIME, weekend: DAYTIME, cruise: CRUISE_SPOT, drone: DAYTIME }, pop: 0.95 },
   },
   {
     id: 'huinnyeoul', zone: 'B', x: 168, y: 190, lat: 35.0785, lng: 129.0447, hub: true,
@@ -129,7 +129,7 @@ export const PLACES: Place[] = [
     short: { ko: '흰여울', en: 'Huinnyeoul', ja: 'ヒンヨウル', zhHans: '白浅滩', zhHant: '白淺灘' },
     scene: 'coast',
     pickup: { ko: '절영해안산책로 입구 안내판 앞', en: 'At the sign of the Jeolyeong coastal walk entrance', ja: '絶影海岸散策路入口の案内板前', zhHans: '绝影海岸步道入口指示牌前', zhHant: '絕影海岸步道入口指示牌前' },
-    crowd: { K: 1600, T: 50, daily: { weekend: 4500, cruise: 5200, drone: 4500 }, profile: same(DAYTIME), pop: 0.6 },
+    crowd: { K: 1600, T: 50, daily: { weekday: 2900, weekend: 4500, cruise: 5200, drone: 4500 }, profile: same(DAYTIME), pop: 0.6 },
   },
   {
     id: 'taejongdae', zone: 'B', x: 286, y: 212, lat: 35.0601, lng: 129.0808, hub: false,
@@ -137,7 +137,7 @@ export const PLACES: Place[] = [
     short: { ko: '태종대', en: 'Taejongdae', ja: '太宗台', zhHans: '太宗台', zhHant: '太宗臺' },
     scene: 'coast',
     pickup: { ko: '태종대 입구 버스 회차지', en: 'Bus turnaround at the Taejongdae entrance', ja: '太宗台入口のバス折り返し場', zhHans: '太宗台入口公交掉头处', zhHant: '太宗臺入口公車迴轉處' },
-    crowd: { K: 3500, T: 100, daily: { weekend: 6000, cruise: 7500, drone: 6000 }, profile: { weekend: DAYTIME, cruise: CRUISE_SPOT, drone: DAYTIME }, pop: 0.7 },
+    crowd: { K: 3500, T: 100, daily: { weekday: 3900, weekend: 6000, cruise: 7500, drone: 6000 }, profile: { weekday: DAYTIME, weekend: DAYTIME, cruise: CRUISE_SPOT, drone: DAYTIME }, pop: 0.7 },
   },
   // Large cruise ships berth at the Yeongdo terminal (Haeyang-ro 301beon-gil 17, Dongsam-dong).
   // Listed before the North Port terminal so that the extra vehicle of a cruise day waits here.

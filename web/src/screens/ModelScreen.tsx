@@ -68,10 +68,10 @@ export function ModelScreen() {
             <li><b>추진·비용:</b> 시범 운영 단계에서 부산시·관광공사 협의체를 통해 통신사 데이터 제휴를 확정합니다. 유상 제휴가 일반적이므로 데이터·API 예산에서 함께 검토합니다.</li>
           </ul>
           <table>
-            <thead><tr><th>명소</th><th>쾌적 수용 K</th><th>평균 체류 T</th><th>하루 방문(주말·크루즈·드론쇼, 가상)</th></tr></thead>
+            <thead><tr><th>명소</th><th>쾌적 수용 K</th><th>평균 체류 T</th><th>하루 방문(평일·주말·크루즈·드론쇼, 가상)</th></tr></thead>
             <tbody>
               {SITES.map((s) => (
-                <tr key={s.id}><td>{placeById(s.id).name.ko}</td><td>{s.spec.K.toLocaleString()}명</td><td>{s.spec.T}분</td><td>{s.spec.daily.weekend.toLocaleString()} · {s.spec.daily.cruise.toLocaleString()} · {s.spec.daily.drone.toLocaleString()}</td></tr>
+                <tr key={s.id}><td>{placeById(s.id).name.ko}</td><td>{s.spec.K.toLocaleString()}명</td><td>{s.spec.T}분</td><td>{s.spec.daily.weekday.toLocaleString()} · {s.spec.daily.weekend.toLocaleString()} · {s.spec.daily.cruise.toLocaleString()} · {s.spec.daily.drone.toLocaleString()}</td></tr>
               ))}
             </tbody>
           </table>

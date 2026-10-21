@@ -106,7 +106,7 @@ describe('required fleet given the plan', () => {
     const { zoneDay, zoneRequired } = await import('./ops');
     const { DEFAULT_LEVERS } = await import('../data/scenario');
     for (const z of ['A', 'B'] as const)
-      for (const d of ['weekend', 'cruise', 'drone'] as const) {
+      for (const d of ['weekday', 'weekend', 'cruise', 'drone'] as const) {
         const day = zoneDay(z, d, DEFAULT_LEVERS);
         const req = zoneRequired(z, d, DEFAULT_LEVERS);
         day.hours.forEach((h, k) => {

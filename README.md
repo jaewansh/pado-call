@@ -19,7 +19,7 @@
 | 관제·예약 대시보드 (한국어) | [#/control](https://jaewansh.github.io/pado-call/#/control) |
 | 수리모형 설명 | [#/model](https://jaewansh.github.io/pado-call/#/model) |
 
-- 언어·시나리오를 주소로 지정할 수 있습니다: [`?lang=en#/call`](https://jaewansh.github.io/pado-call/?lang=en#/call), [`?lang=ja&day=cruise&t=1300#/wave`](https://jaewansh.github.io/pado-call/?lang=ja&day=cruise&t=1300#/wave) (lang = ko · en · ja · zhHans · zhHant, day = weekend · cruise · drone, t = 시각 HHMM)
+- 언어·시나리오를 주소로 지정할 수 있습니다: [`?lang=en#/call`](https://jaewansh.github.io/pado-call/?lang=en#/call), [`?lang=ja&day=cruise&t=1300#/wave`](https://jaewansh.github.io/pado-call/?lang=ja&day=cruise&t=1300#/wave) (lang = ko · en · ja · zhHans · zhHant, day = weekday · weekend · cruise · drone, t = 시각 HHMM)
 - 휴대폰 브라우저에서 열고 **홈 화면에 추가**하면 앱처럼 실행됩니다(PWA).
 - 지도는 OpenStreetMap 기반 실제 지도입니다. 발표장 인터넷이 불안정하면 주소에 `?map=schematic`을 붙여 개략도 지도로 시연할 수 있고, 지도를 불러오지 못하면 개략도로 자동 전환됩니다.
 - 모든 수요·예약·관측값은 **시연용 가상 데이터**이며, 계산은 서버 없이 브라우저에서 실행됩니다.
@@ -88,7 +88,7 @@ $$P_u(a\mid t)=\frac{\exp\left(V_{ua}-\theta\,\widehat{CI}_a(t+\Delta)\right)}{\
 | 지도 | MapLibre GL JS, OpenFreeMap 벡터 타일(OpenStreetMap 데이터, API 키 불필요), 실제 도로 경로(OSRM으로 미리 계산), 오프라인 개략도 대체 |
 | 수리 엔진 | TypeScript — 브라우저에서 실행 (`web/src/engine`) |
 | 참조 엔진·API | Python, NumPy, SciPy, FastAPI (`engine-py`) |
-| 테스트 | Vitest 33개, pytest 15개(TypeScript 결과와 수치 교차 검증), Playwright 화면 점검 |
+| 테스트 | Vitest 42개, pytest 18개(TypeScript 결과와 수치 교차 검증), Playwright 화면 점검 |
 | 배포 | GitHub Pages — `main` 브랜치의 `/docs` 폴더 |
 | 데이터(시범 단계 연계 예정) | **통신사 실시간 유동인구(혼잡도 관측)**, 관광공사 관광지 집중률 예측, 도시철도 역별 승하차, TourAPI, 김해공항 항공편, 크루즈 입항·행사 일정 |
 

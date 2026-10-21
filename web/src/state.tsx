@@ -94,7 +94,7 @@ function initialClock(q: URLSearchParams): number {
 export function StateProvider({ children }: { children: ReactNode }) {
   const q = useMemo(() => new URLSearchParams(window.location.search), []);
   const [lang, setLang] = useState<Lang>(() => initialLang(q));
-  const [day, setDay] = useState<DayType>(() => (['weekend', 'cruise', 'drone'].includes(q.get('day') ?? '') ? (q.get('day') as DayType) : 'drone'));
+  const [day, setDay] = useState<DayType>(() => (['weekday', 'weekend', 'cruise', 'drone'].includes(q.get('day') ?? '') ? (q.get('day') as DayType) : 'drone'));
   const [clock, setClock] = useState<number>(() => initialClock(q));
   const [levers, setLevers] = useState<Levers>(DEFAULT_LEVERS);
   const [trips, setTrips] = useState<TripRecord[]>(() => (q.get('fresh') ? [] : readTrips()));

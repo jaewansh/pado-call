@@ -7,7 +7,7 @@
 import type { ZoneParams } from '../engine/drt';
 
 export type ZoneId = 'A' | 'B';
-export type DayType = 'weekend' | 'cruise' | 'drone';
+export type DayType = 'weekday' | 'weekend' | 'cruise' | 'drone';
 
 export const ZONE_PARAMS: Record<ZoneId, ZoneParams> = {
   // corridor length, ride length, speed, detour, dispatch delay, dwell, pooling proxy ξ
@@ -23,11 +23,14 @@ export const SERVICE_HOURS: Record<ZoneId, [number, number]> = {
 /** Calls per day and hourly shares (sum 1) per zone and day type. */
 const PROFILE: Record<ZoneId, Record<DayType, { calls: number; share: number[] }>> = {
   B: {
+    // weekdays: about three quarters of weekend demand, same daily shape (the fleet stays at 3)
+    weekday: { calls: 30, share: [0.05, 0.08, 0.1, 0.1, 0.105, 0.105, 0.1, 0.1, 0.09, 0.075, 0.055, 0.04] },
     weekend: { calls: 40, share: [0.05, 0.08, 0.1, 0.1, 0.105, 0.105, 0.1, 0.1, 0.09, 0.075, 0.055, 0.04] },
     cruise: { calls: 58, share: [0.09, 0.12, 0.115, 0.09, 0.08, 0.08, 0.085, 0.11, 0.095, 0.06, 0.045, 0.03] },
     drone: { calls: 40, share: [0.05, 0.08, 0.1, 0.1, 0.105, 0.105, 0.1, 0.1, 0.09, 0.075, 0.055, 0.04] },
   },
   A: {
+    weekday: { calls: 30, share: [0.05, 0.06, 0.07, 0.07, 0.07, 0.07, 0.07, 0.09, 0.11, 0.12, 0.12, 0.1] },
     weekend: { calls: 42, share: [0.05, 0.06, 0.07, 0.08, 0.08, 0.08, 0.08, 0.09, 0.1, 0.1, 0.11, 0.1] },
     // cruise days are assumed to be weekdays: lower daytime demand in zone A
     cruise: { calls: 30, share: [0.05, 0.06, 0.07, 0.07, 0.07, 0.07, 0.07, 0.09, 0.11, 0.12, 0.12, 0.1] },
@@ -82,4 +85,4 @@ export function fleetAt(z: ZoneId, d: DayType, t: number, lv: Levers = DEFAULT_L
 
 export const AIRPORT_FLEET = 2;
 
-export const DAY_TYPES: DayType[] = ['weekend', 'cruise', 'drone'];
+export const DAY_TYPES: DayType[] = ['weekday', 'weekend', 'cruise', 'drone'];

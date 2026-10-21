@@ -9,7 +9,14 @@ export default defineConfig({
   build: {
     outDir: '../docs',
     emptyOutDir: true,
-    chunkSizeWarningLimit: 900,
+    chunkSizeWarningLimit: 1300,
+    rollupOptions: {
+      output: {
+        // the MapLibre worker is an ES-module asset: emit it as .js so every static host serves a JavaScript MIME type
+        assetFileNames: (info: { name?: string; names?: string[] }) =>
+          (info.names?.[0] ?? info.name ?? '').endsWith('.mjs') ? 'assets/[name]-[hash].js' : 'assets/[name]-[hash][extname]',
+      },
+    },
   },
   test: {
     environment: 'node',

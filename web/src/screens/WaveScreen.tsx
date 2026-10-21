@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../state';
-import { placeById, placesInZone, type Lang, type PlaceId } from '../data/places';
+import { ZONE_POLYGONS, placeById, placesInZone, type Lang, type PlaceId } from '../data/places';
 import type { ZoneId } from '../data/scenario';
 import { bestHour, ciAt, ciSdAt, isOpen, pOverAt, type CrowdForecast } from '../engine/crowd';
 import { alternatives } from '../engine/choice';
@@ -8,6 +8,8 @@ import { crowdAt, rideMinutes, siteIndex, SITES } from '../engine/ops';
 import { fmtCi, fmtMin, fmtPct, fmtTime, t } from '../i18n/strings';
 import { Icon } from '../components/Icon';
 import { ZoneMap, type CrowdMark } from '../components/ZoneMap';
+import { RealMap } from '../components/RealMap';
+import { crowdMarks } from '../components/mapMarks';
 import { ForecastChart, Legend, LevelTag, type FcPoint } from '../components/Widgets';
 
 interface AlertItem {
@@ -89,10 +91,17 @@ export function WaveScreen() {
           </button>
         ))}
       </div>
-      <div className="map-wrap">
-        <ZoneMap zone={zone} lang={lang} mode="crowd" crowd={marks} selected={selected} onPick={(id) => placeById(id).crowd && setSel(id)} ariaLabel={t(`zone.${zone}` as 'zone.A', lang)} />
+      <RealMap
+        lang={lang}
+        ariaLabel={t(`zone.${zone}` as 'zone.A', lang)}
+        polygon={ZONE_POLYGONS[zone]}
+        fitTo={ZONE_POLYGONS[zone]}
+        marks={crowdMarks(zone, lang, marks, selected)}
+        onPick={(id) => placeById(id as PlaceId).crowd && setSel(id as PlaceId)}
+        fallback={<ZoneMap zone={zone} lang={lang} mode="crowd" crowd={marks} selected={selected} onPick={(id) => placeById(id).crowd && setSel(id)} ariaLabel={t(`zone.${zone}` as 'zone.A', lang)} />}
+      >
         <span className="badge"><Icon name="clock" size={14} />{fmtTime(T)}</span>
-      </div>
+      </RealMap>
       <Legend lang={lang} />
 
       {alerts.map((a) => (

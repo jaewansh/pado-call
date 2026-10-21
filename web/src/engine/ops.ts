@@ -7,7 +7,7 @@ import { crowdForecast, type CrowdForecast, type Site } from './crowd';
 import { dispersal, type Dispersal } from './choice';
 import { gatewayKpis, planGateway, executeGateway, syntheticBookings, type GatewayPlan, type ExecStats } from './airport';
 import { DEFAULT_LEVERS, SERVICE_HOURS, ZONE_PARAMS, fleetAt, lamEff, type DayType, type Levers, type ZoneId } from '../data/scenario';
-import { crowdSites, placeById, type PlaceId } from '../data/places';
+import { crowdSites, haversineKm, placeById, type PlaceId } from '../data/places';
 
 const memo = new Map<string, unknown>();
 function cached<T>(key: string, fn: () => T): T {
@@ -54,12 +54,12 @@ export function rideQuote(z: ZoneId, d: DayType, lv: Levers, t: number): RideQuo
   return { open: true, opens, closes, mean: w.mean, q90: w.q90, p10: w.p10, p20: w.p20, p30: w.p30, fleet: w.fleet };
 }
 
-/** In-zone ride time between two places of the schematic map (detour-adjusted). */
+/** In-zone ride time between two places (straight-line distance × road detour factor). */
 export function rideMinutes(a: PlaceId, b: PlaceId): number {
   const pa = placeById(a);
   const pb = placeById(b);
   const p = ZONE_PARAMS[pa.zone];
-  const km = Math.hypot(pa.x - pb.x, pa.y - pb.y) * (p.ellKm / 300);
+  const km = haversineKm(pa, pb);
   return Math.max(4, Math.round((60 * p.detour * km) / p.speedKmh + 1));
 }
 

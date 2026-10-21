@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useApp } from '../state';
-import { AREAS, PLACES, areaById, placeById, placesInZone, type AreaId, type Lang, type PlaceId } from '../data/places';
+import { AREAS, PLACES, ZONE_POLYGONS, areaById, placeById, placesInZone, type AreaId, type Lang, type PlaceId } from '../data/places';
 import { quoteArrival, departureSlots, FARE_PER_PERSON, READY_AFTER_LANDING } from '../engine/airport';
 import { alternatives } from '../engine/choice';
 import { ciAt, ciLevel, isOpen } from '../engine/crowd';
@@ -8,6 +8,8 @@ import { crowdAt, rideMinutes, rideQuote, siteIndex, SITES } from '../engine/ops
 import { fmtHM, fmtMin, fmtTime, fmtWon, t } from '../i18n/strings';
 import { Icon } from '../components/Icon';
 import { ZoneMap } from '../components/ZoneMap';
+import { RealMap } from '../components/RealMap';
+import { airportFit, airportLine, airportMarks, rideLine, rideMarks } from '../components/mapMarks';
 import { LevelTag, PickupPhoto, Stepper, TideGauge } from '../components/Widgets';
 
 const toInput = (m: number) => fmtTime(m);
@@ -81,6 +83,7 @@ function AirportArrive() {
   };
   return (
     <>
+      <RealMap lang={lang} ariaLabel={t('call.arr', lang)} aspect="16 / 9" marks={airportMarks(area, lang)} line={airportLine(area)} lineColor="#c07a00" fitTo={airportFit(area)} />
       <div className="card">
         <div className="grid2">
           <div className="field">
@@ -184,6 +187,7 @@ function AirportLeave() {
   };
   return (
     <>
+      <RealMap lang={lang} ariaLabel={t('call.dep', lang)} aspect="16 / 9" marks={airportMarks(area, lang)} line={airportLine(area)} lineColor="#c07a00" fitTo={airportFit(area)} />
       <div className="card">
         <div className="grid2">
           <div className="field">
@@ -317,9 +321,16 @@ function RideNow() {
   const zonePlaces = placesInZone(zone);
   return (
     <>
-      <div className="map-wrap">
-        <ZoneMap zone={zone} lang={lang} mode="ride" from={from} to={to} vans={q.open ? q.fleet : 0} onPick={pickOnMap} ariaLabel={t(`zone.${zone}` as 'zone.A', lang)} />
-      </div>
+      <RealMap
+        lang={lang}
+        ariaLabel={t(`zone.${zone}` as 'zone.A', lang)}
+        polygon={ZONE_POLYGONS[zone]}
+        fitTo={ZONE_POLYGONS[zone]}
+        marks={rideMarks(zone, lang, from, to, q.open ? q.fleet : 0)}
+        line={rideLine(placeById(from), placeById(to))}
+        onPick={(id) => pickOnMap(id as PlaceId)}
+        fallback={<ZoneMap zone={zone} lang={lang} mode="ride" from={from} to={to} vans={q.open ? q.fleet : 0} onPick={pickOnMap} ariaLabel={t(`zone.${zone}` as 'zone.A', lang)} />}
+      />
       <div className="row sub" style={{ marginTop: 8, fontWeight: 700, color: 'var(--navy)' }}>
         <Icon name="van" size={18} />
         <span>{t(`zone.${zone}` as 'zone.A', lang)} · {q.open ? t('ride.fleet', lang, { n: q.fleet }) : `${fmtTime(q.opens)}–${fmtTime(q.closes)}`}</span>

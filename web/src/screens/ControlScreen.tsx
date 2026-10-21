@@ -229,7 +229,7 @@ export function ControlScreen() {
           <Panel
             wide
             title="명소 혼잡지수 — 관측 보정과 예측"
-            sub="혼잡지수 CI = 체류 인원 ÷ 쾌적 수용 인원. 기준 시각까지는 매시간 관측으로 보정(앙상블 칼만필터), 이후는 예측. 칸 위에 마우스를 올리면 값·혼잡 확률이 보입니다."
+            sub="혼잡지수 CI = 체류 인원 ÷ 쾌적 수용 인원. 기준 시각까지는 매시간 관측으로 보정(앙상블 칼만필터), 이후는 예측. 시연은 가상 관측이며, 시범 단계에서는 통신사 실시간 유동인구를 관측으로 씁니다. 칸 위에 마우스를 올리면 값·혼잡 확률이 보입니다."
             table={
               <table className="dtable">
                 <thead><tr><th>명소</th>{heatHours.map((h) => <th key={h}>{h}시</th>)}</tr></thead>

@@ -112,4 +112,6 @@
 .model .pipeline div { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 13px; background: var(--mist); }
 .model .pipeline b { display: block; color: var(--navy); font-size: 14px; margin-bottom: 2px; }
 .model .ref { font-size: 13px; color: var(--muted); }
+.model .sub-h { margin: 18px 0 2px; font-size: 15px; color: var(--navy); }
+.model ul { padding-left: 20px; }
 @media (max-width: 700px) { .model .pipeline { grid-template-columns: 1fr 1fr; } }

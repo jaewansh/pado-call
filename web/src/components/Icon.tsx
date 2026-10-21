@@ -1,7 +1,8 @@
 /** Small stroke icons (24×24). */
 type Name =
   | 'van' | 'plane' | 'wave' | 'ticket' | 'mic' | 'users' | 'bag' | 'wheelchair' | 'stroller'
-  | 'pin' | 'warn' | 'clock' | 'globe' | 'caret' | 'check' | 'chev' | 'hotel' | 'camera' | 'x';
+  | 'pin' | 'warn' | 'clock' | 'globe' | 'caret' | 'check' | 'chev' | 'hotel' | 'camera' | 'x'
+  | 'card' | 'qr' | 'image';
 
 const P: Record<Name, JSX.Element> = {
   van: (
@@ -95,6 +96,25 @@ const P: Record<Name, JSX.Element> = {
     </>
   ),
   x: <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />,
+  card: (
+    <>
+      <rect x="3" y="5.5" width="18" height="13" rx="2" />
+      <path d="M3 9.8h18M6.5 15h4" />
+    </>
+  ),
+  qr: (
+    <>
+      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" />
+      <path d="M14 14h2.5v2.5H14zM18.5 14H20M14 19.5h2.5M18.5 17.5V20H20" />
+    </>
+  ),
+  image: (
+    <>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+      <circle cx="9" cy="10" r="1.8" />
+      <path d="M20.5 15.5l-4.8-4.8-8.7 8.8" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 20, className, title }: { name: Name; size?: number; className?: string; title?: string }) {

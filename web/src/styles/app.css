@@ -396,3 +396,55 @@ button.mk { cursor: pointer; }
 .lab-top.mk-hotel .mk-label { bottom: calc(50% + 15px); }
 button.mk:focus-visible { outline: none; }
 button.mk:focus-visible .mk-dot { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+/* ------------------------------------------------------------------ payment sheet */
+.sheet-backdrop { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; background: rgba(15, 43, 70, 0.45); animation: fade-in 0.18s ease-out; }
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 92%;
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  padding: 10px 18px calc(18px + env(safe-area-inset-bottom));
+  box-shadow: 0 -12px 40px rgba(15, 43, 70, 0.22);
+  outline: none;
+  animation: sheet-up 0.24s ease-out;
+}
+.sheet h2 { margin: 4px 0 0; font-size: 19px; font-weight: 800; color: var(--navy); }
+.sheet-grip { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 0 auto 10px; }
+.pay-methods { border: 0; padding: 0; margin: 14px 0 0; display: grid; gap: 6px; min-width: 0; }
+.pay-methods legend { padding: 0; margin-bottom: 6px; }
+.pay-opt { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; font-size: 14px; font-weight: 700; color: var(--navy); cursor: pointer; background: var(--surface); }
+.pay-opt input { width: 18px; height: 18px; margin: 0; accent-color: var(--teal-ink); flex: none; }
+.pay-opt:has(input:checked) { border-color: var(--foam-line); background: var(--foam); }
+.pay-notes { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 7px; font-size: 13px; color: var(--ink); line-height: 1.45; }
+.pay-notes li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: start; }
+.pay-notes svg { margin-top: 2px; color: var(--teal-ink); }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sheet-up { from { transform: translateY(24px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+
+/* ------------------------------------------------------------------ QR boarding pass */
+.qr-pass { display: grid; justify-items: center; text-align: center; gap: 6px; }
+.qr-pass .label { display: inline-flex; align-items: center; gap: 5px; color: var(--navy); }
+.qr-btn { border: 1px solid var(--line); background: #fff; padding: 6px; border-radius: 14px; line-height: 0; cursor: zoom-in; }
+.qr-btn:hover { border-color: var(--foam-line); }
+.qr { display: block; }
+.code-sm { font-weight: 800; letter-spacing: 1.2px; color: var(--navy); }
+.demo-link { margin-top: 2px; font-size: 12.5px; font-weight: 700; color: var(--blue); text-underline-offset: 3px; }
+.qr-full { position: fixed; inset: 0; z-index: 40; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; animation: fade-in 0.15s ease-out; }
+.qr-full .qr { width: min(80vw, 320px); height: min(80vw, 320px); }
+.qr-full .code { font-size: 26px; font-weight: 800; letter-spacing: 2px; color: var(--navy); }
+.qr-full p { margin: 0; max-width: 30ch; }
+.boarded { display: flex; align-items: center; gap: 8px; border-radius: 12px; padding: 10px 12px; background: #eaf7f0; color: #14794a; font-weight: 800; font-size: 14px; }
+.pay-line { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.35; max-width: 62%; }
+.pay-line svg { flex: none; color: var(--teal-ink); }
+.pay-line.captured { color: #14794a; }
+.pay-line.captured svg { color: #14794a; }
+.pay-line.released { color: var(--muted); }
+.pay-line.released svg { color: var(--muted); }
+@media (min-width: 1000px) {
+  /* keep the sheet and the full-screen QR inside the phone frame */
+  .sheet-backdrop, .qr-full { position: absolute; }
+  .toast { position: absolute; bottom: 84px; }
+}

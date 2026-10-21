@@ -1,15 +1,17 @@
 import { useMemo, useRef, useState } from 'react';
-import { useApp } from '../state';
+import { useApp, type PayMethod } from '../state';
 import { AREAS, PLACES, ZONE_POLYGONS, areaById, placeById, placesInZone, type AreaId, type Lang, type PlaceId } from '../data/places';
 import { quoteArrival, departureSlots, FARE_PER_PERSON, READY_AFTER_LANDING } from '../engine/airport';
 import { alternatives } from '../engine/choice';
 import { ciAt, ciLevel, isOpen } from '../engine/crowd';
 import { crowdAt, rideMinutes, rideQuote, siteIndex, SITES } from '../engine/ops';
+import type { DayType } from '../data/scenario';
 import { fmtHM, fmtMin, fmtTime, fmtWon, t } from '../i18n/strings';
 import { Icon } from '../components/Icon';
 import { ZoneMap } from '../components/ZoneMap';
 import { RealMap } from '../components/RealMap';
-import { airportFit, airportLine, airportMarks, rideLine, rideMarks } from '../components/mapMarks';
+import { AIRPORT_NAME, airportFit, airportLine, airportMarks, rideLine, rideMarks } from '../components/mapMarks';
+import { PaySheet } from '../components/PaySheet';
 import { LevelTag, PickupPhoto, Stepper, TideGauge } from '../components/Widgets';
 
 const toInput = (m: number) => fmtTime(m);
@@ -63,26 +65,50 @@ function AreaSelect({ value, onChange, lang, id }: { value: AreaId; onChange: (a
   );
 }
 
+/**
+ * Example flight times follow the demo clock: the soonest landing from 30 min ahead whose shuttle
+ * leaves within 15 min of baggage claim, and the soonest departure from 3 h ahead with a hotel pickup
+ * still to come. Late in the day an afternoon example is used instead. Any time can be typed in.
+ */
+const roundUp5 = (m: number) => Math.ceil(m / 5) * 5;
+function firstTime(from: number, to: number, ok: (m: number) => boolean): number | null {
+  for (let m = from; m <= to; m += 5) if (ok(m)) return m;
+  return null;
+}
+function defaultLanding(day: DayType, clock: number): number {
+  const ok = (m: number) => {
+    const q = quoteArrival(day, m, 'gwangalli', 2, 2);
+    return q.ok && q.wait <= 15;
+  };
+  return firstTime(Math.max(6 * 60, roundUp5(clock + 30)), 21 * 60 + 30, ok) ?? firstTime(15 * 60, 21 * 60 + 30, ok) ?? 15 * 60 + 50;
+}
+function defaultFlightDep(day: DayType, clock: number): number {
+  const ok = (after: number) => (m: number) => departureSlots(day, m, 'haeundae', 2).some((x) => x.pickup >= after);
+  return firstTime(Math.max(9 * 60, roundUp5(clock + 180)), 22 * 60 + 30, ok(clock + 15)) ?? firstTime(15 * 60, 22 * 60 + 30, ok(0)) ?? 17 * 60;
+}
+
 function AirportArrive() {
   const { lang, day, clock, addTrip, showToast, go } = useApp();
   const [flight, setFlight] = useState('');
-  const [landing, setLanding] = useState(15 * 60 + 50);
+  const [landing, setLanding] = useState(() => defaultLanding(day, clock));
+  const [paying, setPaying] = useState(false);
   const [area, setArea] = useState<AreaId>('gwangalli');
   const [pax, setPax] = useState(2);
   const [bags, setBags] = useState(2);
   const [delay, setDelay] = useState(false);
   const q = useMemo(() => quoteArrival(day, landing, area, pax, bags, delay ? 40 : 0), [day, landing, area, pax, bags, delay]);
   const shared = q.sharedWith === 0 ? t('call.shared0', lang) : q.sharedWith === 1 ? t('call.shared1', lang) : t('call.sharedN', lang, { n: q.sharedWith });
-  const book = () => {
-    const rec = addTrip({
+  const book = (method: PayMethod) => {
+    addTrip({
       kind: 'arr', day, createdAt: clock, pickup: q.depart, arrive: q.eta50, zone: areaById(area).zone,
-      from: 'airport', to: area, pax, fare: q.fare, note: flight.trim() || undefined,
+      from: 'airport', to: area, pax, fare: q.fare, note: flight.trim() || undefined, lang, pay: { method, status: 'authorized' },
     });
-    showToast(t('toast.booked', lang, { code: rec.code }));
+    showToast(t('toast.paidBooked', lang));
     go('trips');
   };
   return (
     <>
+      {paying ? <PaySheet lang={lang} kind="airport" amount={q.fare} summary={t('pay.summary', lang, { a: AIRPORT_NAME[lang], b: areaById(area).name[lang], n: pax })} onConfirm={book} onClose={() => setPaying(false)} /> : null}
       <RealMap lang={lang} ariaLabel={t('call.arr', lang)} aspect="16 / 9" marks={airportMarks(area, lang)} line={airportLine(area, 'arr')} lineColor="#c07a00" fitTo={airportFit(area, 'arr')} />
       <div className="card">
         <div className="grid2">
@@ -158,7 +184,7 @@ function AirportArrive() {
               {delay && q.delayed ? <span className="sub ink">{t('call.delayResult', lang, { t: fmtTime(q.delayed.depart), t2: fmtTime(q.delayed.eta50) })}</span> : null}
             </div>
           </div>
-          <button type="button" className="btn-primary amber" onClick={book}>{t('call.book', lang)}</button>
+          <button type="button" className="btn-primary amber" onClick={() => setPaying(true)}>{t('call.book', lang)}</button>
           <p className="note">{t('call.compare', lang)}</p>
         </div>
       ) : (
@@ -170,23 +196,25 @@ function AirportArrive() {
 
 function AirportLeave() {
   const { lang, day, clock, addTrip, showToast, go } = useApp();
-  const [flightDep, setFlightDep] = useState(17 * 60);
+  const [flightDep, setFlightDep] = useState(() => defaultFlightDep(day, clock));
+  const [paying, setPaying] = useState(false);
   const [area, setArea] = useState<AreaId>('haeundae');
   const [pax, setPax] = useState(2);
   const slots = useMemo(() => departureSlots(day, flightDep, area, pax), [day, flightDep, area, pax]);
   const [pick, setPick] = useState(0);
   const chosen = slots[Math.min(pick, slots.length - 1)];
-  const book = () => {
+  const book = (method: PayMethod) => {
     if (!chosen) return;
-    const rec = addTrip({
+    addTrip({
       kind: 'dep', day, createdAt: clock, pickup: chosen.pickup, arrive: chosen.airport50, zone: areaById(area).zone,
-      from: area, to: 'airport', pax, fare: FARE_PER_PERSON * pax,
+      from: area, to: 'airport', pax, fare: FARE_PER_PERSON * pax, lang, pay: { method, status: 'authorized' },
     });
-    showToast(t('toast.booked', lang, { code: rec.code }));
+    showToast(t('toast.paidBooked', lang));
     go('trips');
   };
   return (
     <>
+      {paying && chosen ? <PaySheet lang={lang} kind="airport" amount={FARE_PER_PERSON * pax} summary={t('pay.summary', lang, { a: areaById(area).name[lang], b: AIRPORT_NAME[lang], n: pax })} onConfirm={book} onClose={() => setPaying(false)} /> : null}
       <RealMap lang={lang} ariaLabel={t('call.dep', lang)} aspect="16 / 9" marks={airportMarks(area, lang)} line={airportLine(area, 'dep')} lineColor="#c07a00" fitTo={airportFit(area, 'dep')} />
       <div className="card">
         <div className="grid2">
@@ -221,7 +249,7 @@ function AirportLeave() {
             <span className="sub">{t('call.vanNote', lang)}</span>
             <span className="value">{fmtWon(FARE_PER_PERSON * pax)}</span>
           </div>
-          <button type="button" className="btn-primary amber" onClick={book}>{t('call.bookPickup', lang)}</button>
+          <button type="button" className="btn-primary amber" onClick={() => setPaying(true)}>{t('call.bookPickup', lang)}</button>
         </div>
       ) : (
         <div className="card" style={{ background: 'var(--mist)' }}>
@@ -270,6 +298,7 @@ function RideNow() {
   const [opts, setOpts] = useState({ wheelchair: false, stroller: false, luggage: false });
   const [heard, setHeard] = useState<string | null>(null);
   const [listening, setListening] = useState(false);
+  const [paying, setPaying] = useState(false);
   const recRef = useRef<SR | null>(null);
   const zone = placeById(from).zone;
   const q = rideQuote(zone, day, levers, clock);
@@ -319,17 +348,19 @@ function RideNow() {
       setListening(false);
     }
   };
-  const call = () => {
+  const call = (method: PayMethod) => {
     addTrip({
       kind: 'ride', day, createdAt: clock, pickup: clock + q.mean, arrive, zone, from, to, pax, fare: 3000 * pax,
       note: [opts.wheelchair && 'wheelchair', opts.stroller && 'stroller', opts.luggage && 'luggage'].filter(Boolean).join(',') || undefined,
+      lang, pay: { method, status: 'authorized' },
     });
-    showToast(t('toast.called', lang, { m: fmtMin(q.mean, lang) }));
+    showToast(t('toast.paidCalled', lang, { m: fmtMin(q.mean, lang) }));
     go('trips');
   };
   const zonePlaces = placesInZone(zone);
   return (
     <>
+      {paying ? <PaySheet lang={lang} kind="ride" amount={3000 * pax} summary={t('pay.summary', lang, { a: placeById(from).short[lang], b: placeById(to).short[lang], n: pax })} onConfirm={call} onClose={() => setPaying(false)} /> : null}
       <RealMap
         lang={lang}
         ariaLabel={t(`zone.${zone}` as 'zone.A', lang)}
@@ -443,7 +474,7 @@ function RideNow() {
           <span className="sub">{t('ride.fare', lang)}</span>
           <span className="value">{fmtWon(3000 * pax)}</span>
         </div>
-        <button type="button" className="btn-primary" disabled={!q.open} onClick={call}>
+        <button type="button" className="btn-primary" disabled={!q.open} onClick={() => setPaying(true)}>
           <Icon name="van" size={20} /> {t('ride.call', lang)}
         </button>
       </div>

@@ -29,18 +29,21 @@ function Panel({ title, sub, table, children, wide }: { title: string; sub?: Rea
   );
 }
 
-export function DashHeader({ current }: { current: 'control' | 'model' }) {
+const DASH_TITLE = { control: '관제·예약 대시보드', model: '수리모형', driver: '기사 앱 · QR 탑승 확인' };
+
+export function DashHeader({ current }: { current: 'control' | 'model' | 'driver' }) {
   return (
     <header className="dash-head">
       <div className="inner">
         <div className="title">
           <div className="brand"><WaveMark size={26} /><span>PADO <b>CALL</b></span></div>
           <span className="sep" aria-hidden="true" />
-          <h1>{current === 'control' ? '관제·예약 대시보드' : '수리모형'}</h1>
+          <h1>{DASH_TITLE[current]}</h1>
         </div>
         <nav aria-label="파도콜">
           <a href="#/control" aria-current={current === 'control' ? 'page' : undefined}>관제 대시보드</a>
           <a href="#/model" aria-current={current === 'model' ? 'page' : undefined}>수리모형</a>
+          <a href="#/driver" aria-current={current === 'driver' ? 'page' : undefined}>기사 앱</a>
           <a href="#/call">관광객 앱</a>
         </nav>
       </div>

@@ -2,9 +2,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { AreaId, Lang, PlaceId } from './data/places';
 import { DEFAULT_LEVERS, type DayType, type Levers, type ZoneId } from './data/scenario';
-import { LANGS } from './i18n/strings';
+import { LANGS, fmtWon, t } from './i18n/strings';
+import { makeBoardingToken } from './lib/boarding';
 
 export type TripKind = 'arr' | 'dep' | 'ride';
+/** Payment methods offered at booking (demo: nothing is charged). */
+export type PayMethod = 'card' | 'wallet' | 'alipay' | 'kr';
 export interface TripRecord {
   id: string;
   kind: TripKind;
@@ -20,10 +23,14 @@ export interface TripRecord {
   fare: number;
   note?: string; // flight number etc.
   cancelled?: boolean;
+  lang?: Lang; // passenger language (shown to the driver)
+  pay?: { method: PayMethod; status: 'authorized' | 'captured' | 'released' }; // authorised when booking, captured at boarding
+  token?: string; // one-time QR boarding token
+  boardedAt?: number; // demo minute when the driver scanned the QR
 }
 
 export interface Route {
-  path: string; // 'call' | 'wave' | 'trips' | 'control' | 'model'
+  path: string; // 'call' | 'wave' | 'trips' | 'control' | 'model' | 'driver'
   params: URLSearchParams;
 }
 
@@ -37,8 +44,9 @@ interface Ctx {
   levers: Levers;
   setLevers: (l: Levers) => void;
   trips: TripRecord[];
-  addTrip: (t: Omit<TripRecord, 'id' | 'code'>) => TripRecord;
+  addTrip: (t: Omit<TripRecord, 'id' | 'code' | 'token'>) => TripRecord;
   cancelTrip: (id: string) => void;
+  boardTrip: (id: string, at: number) => void;
   toast: string | null;
   showToast: (s: string) => void;
   route: Route;
@@ -101,6 +109,7 @@ export function StateProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<string | null>(null);
   const [route, setRoute] = useState<Route>(parseRoute);
   const toastTimer = useRef<number | undefined>(undefined);
+  const showToastRef = useRef<(s: string) => void>(() => undefined);
 
   useEffect(() => {
     const on = () => setRoute(parseRoute());
@@ -108,9 +117,26 @@ export function StateProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('hashchange', on);
   }, []);
 
+  // Another tab (e.g. the driver screen) changed the trips: follow it, and tell the passenger when a QR was scanned.
+  const tripsRef = useRef(trips);
+  tripsRef.current = trips;
+  const langRef = useRef(lang);
+  langRef.current = lang;
+  useEffect(() => {
+    const on = (e: StorageEvent) => {
+      if (e.key !== STORE) return;
+      const next = readTrips();
+      const boarded = next.find((n) => n.boardedAt != null && tripsRef.current.some((p) => p.id === n.id && p.boardedAt == null));
+      setTrips(next);
+      if (boarded) showToastRef.current(t('toast.boarded', langRef.current, { a: fmtWon(boarded.fare) }));
+    };
+    window.addEventListener('storage', on);
+    return () => window.removeEventListener('storage', on);
+  }, []);
+
   useEffect(() => {
     const html = LANGS.find((l) => l.id === lang)?.html ?? 'en';
-    document.documentElement.lang = route.path === 'control' || route.path === 'model' ? 'ko' : html;
+    document.documentElement.lang = ['control', 'model', 'driver'].includes(route.path) ? 'ko' : html;
   }, [lang, route.path]);
 
   const go = useCallback((path: string, params?: Record<string, string>) => {
@@ -124,10 +150,13 @@ export function StateProvider({ children }: { children: ReactNode }) {
     window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), 3600);
   }, []);
+  showToastRef.current = showToast;
 
-  const addTrip = useCallback((tr: Omit<TripRecord, 'id' | 'code'>) => {
-    const code = Array.from({ length: 4 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('');
-    const rec: TripRecord = { ...tr, id: `${Date.now()}-${Math.floor(Math.random() * 1e6)}`, code: `PD-${code}` };
+  const addTrip = useCallback((tr: Omit<TripRecord, 'id' | 'code' | 'token'>) => {
+    const code = `PD-${Array.from({ length: 4 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('')}`;
+    const id = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+    const token = makeBoardingToken({ c: code, k: tr.kind, f: tr.from, t: tr.to, p: tr.pax, a: tr.fare, u: tr.pickup, d: tr.day, l: tr.lang ?? 'en', n: tr.note });
+    const rec: TripRecord = { ...tr, id, code, token };
     setTrips((prev) => {
       const next = [rec, ...prev].slice(0, 30);
       writeTrips(next);
@@ -138,13 +167,21 @@ export function StateProvider({ children }: { children: ReactNode }) {
 
   const cancelTrip = useCallback((id: string) => {
     setTrips((prev) => {
-      const next = prev.map((x) => (x.id === id ? { ...x, cancelled: true } : x));
+      const next = prev.map((x) => (x.id === id ? { ...x, cancelled: true, pay: x.pay ? { ...x.pay, status: 'released' as const } : x.pay } : x));
       writeTrips(next);
       return next;
     });
   }, []);
 
-  const value: Ctx = { lang, setLang, day, setDay, clock, setClock, levers, setLevers, trips, addTrip, cancelTrip, toast, showToast, route, go };
+  const boardTrip = useCallback((id: string, at: number) => {
+    setTrips((prev) => {
+      const next = prev.map((x) => (x.id === id && !x.cancelled ? { ...x, boardedAt: at, pay: x.pay ? { ...x.pay, status: 'captured' as const } : x.pay } : x));
+      writeTrips(next);
+      return next;
+    });
+  }, []);
+
+  const value: Ctx = { lang, setLang, day, setDay, clock, setClock, levers, setLevers, trips, addTrip, cancelTrip, boardTrip, toast, showToast, route, go };
   return <StateCtx.Provider value={value}>{children}</StateCtx.Provider>;
 }
 

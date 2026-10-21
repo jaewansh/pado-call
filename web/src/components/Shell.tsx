@@ -81,8 +81,9 @@ export function DemoPanel() {
         <div className="links">
           <a href="#/control">관제·예약 대시보드 <span>Control</span></a>
           <a href="#/model">수리모형 설명 <span>Models</span></a>
+          <a href="#/driver">기사 앱 · QR 탑승 확인 <span>Driver</span></a>
         </div>
-        <p className="fine">지도는 개략도이며 차량·요금·수요는 기획안의 가정치입니다.</p>
+        <p className="fine">지도는 OpenStreetMap 실제 지도(연결이 안 되면 개략도)이고, 차량·요금·수요는 기획안의 가정치이며 결제는 모의 시연입니다.</p>
       </div>
     </aside>
   );

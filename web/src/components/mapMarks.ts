@@ -75,7 +75,7 @@ export function rideLine(from: Place, to: Place): [number, number][] {
   return [[from.lng, from.lat], ...r.line, [to.lng, to.lat]];
 }
 
-const AIRPORT_NAME: Record<Lang, string> = { ko: '김해공항', en: 'Gimhae Airport', ja: '金海空港', zhHans: '金海机场', zhHant: '金海機場' };
+export const AIRPORT_NAME: Record<Lang, string> = { ko: '김해공항', en: 'Gimhae Airport', ja: '金海空港', zhHans: '金海机场', zhHant: '金海機場' };
 
 /** Airport ↔ hotel area (direction: 'arr' airport → hotel, 'dep' hotel → airport). */
 export function airportMarks(area: AreaId, lang: Lang): MapMark[] {

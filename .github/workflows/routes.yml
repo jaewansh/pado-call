@@ -25,5 +25,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A shots
+          git add -A shots shots2
           git diff --cached --quiet || { git commit -m "앱 화면 캡처 (실제 지도)"; git push; }

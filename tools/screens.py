@@ -1,26 +1,25 @@
-"""Screenshots of the live demo (real map) for the plan deck."""
+"""Screenshots of the live demo (real map) for the plan deck — demo banner hidden, chosen scroll positions."""
 import asyncio
 import os
 
 from playwright.async_api import async_playwright
 
 BASE = 'https://jaewansh.github.io/pado-call/'
-OUT = 'shots'
+OUT = 'shots2'
 os.makedirs(OUT, exist_ok=True)
+HIDE = 'aside.demo { display: none !important; }'
 
-SCENES = [
-    # name, lang, day, time, hash
-    ('airport_en', 'en', 'drone', '1930', '#/call'),
-    ('ride_zh', 'zhHans', 'drone', '1930', '#/call?seg=ride&from=haeundae&to=gwangalli'),
-    ('wave_ja', 'ja', 'drone', '1930', '#/wave'),
-    ('airport_ko', 'ko', 'drone', '1930', '#/call'),
-    ('ride_ko', 'ko', 'drone', '1930', '#/call?seg=ride&from=haeundae&to=gwangalli'),
-    ('wave_ko', 'ko', 'drone', '1930', '#/wave'),
-    ('ride_ko_cruise', 'ko', 'cruise', '1100', '#/call?seg=ride&from=ydcruise&to=gamcheon'),
-    ('ride_en_cruise', 'en', 'cruise', '1100', '#/call?seg=ride&from=ydcruise&to=gamcheon'),
-    ('wave_ko_cruise', 'ko', 'cruise', '1200', '#/wave?zone=B'),
-    ('wave_zht_cruise', 'zhHant', 'cruise', '1200', '#/wave?zone=B'),
-    ('airport_ja_dep', 'ja', 'weekend', '1500', '#/call?seg=dep'),
+PHONE = [
+    # name, lang, day, time, hash, scrollY
+    ('airport_en', 'en', 'drone', '1930', '#/call', 0),
+    ('airport_en_card', 'en', 'drone', '1930', '#/call', 384),
+    ('ride_zh', 'zhHans', 'drone', '1930', '#/call?seg=ride&from=haeundae&to=gwangalli', 0),
+    ('ride_zh_gauge', 'zhHans', 'drone', '1930', '#/call?seg=ride&from=haeundae&to=gwangalli', 60),
+    ('wave_ja', 'ja', 'drone', '1930', '#/wave', 0),
+    ('ride_ko_cruise', 'ko', 'cruise', '1100', '#/call?seg=ride&from=ydcruise&to=gamcheon', 0),
+    ('wave_ko_cruise', 'ko', 'cruise', '1200', '#/wave?zone=B', 0),
+    ('airport_ko_card', 'ko', 'drone', '1930', '#/call', 384),
+    ('ride_en_cruise', 'en', 'cruise', '1100', '#/call?seg=ride&from=ydcruise&to=gamcheon', 0),
 ]
 
 
@@ -33,27 +32,32 @@ async def settle(pg):
         await pg.wait_for_load_state('networkidle', timeout=20000)
     except Exception:
         pass
-    await pg.wait_for_timeout(5000)  # tiles and label layout
-    offline = await pg.locator('.map-note').count()
-    return 'schematic' if offline else 'real'
+    await pg.wait_for_timeout(5000)
+    return 'schematic' if await pg.locator('.map-note').count() else 'real'
+
+
+async def open_page(b, url, w=390, h=844, scale=3):
+    ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=scale)
+    pg = await ctx.new_page()
+    await pg.goto(url, wait_until='domcontentloaded')
+    await pg.add_style_tag(content=HIDE)
+    return ctx, pg
 
 
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()
-        for name, lang, day, t, h in SCENES:
-            ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=3)
-            pg = await ctx.new_page()
-            await pg.goto(f'{BASE}?lang={lang}&day={day}&t={t}&fresh=1{h}', wait_until='domcontentloaded')
+        for name, lang, day, t, h, y in PHONE:
+            ctx, pg = await open_page(b, f'{BASE}?lang={lang}&day={day}&t={t}&fresh=1{h}')
             mode = await settle(pg)
+            if y:
+                await pg.evaluate(f'window.scrollTo(0, {y})')
+                await pg.wait_for_timeout(1200)
             await pg.screenshot(path=f'{OUT}/{name}.png')
-            await pg.screenshot(path=f'{OUT}/{name}_full.png', full_page=True)
             print(name, mode, flush=True)
             await ctx.close()
         # trips after an airport booking and a ride call (Korean)
-        ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=3)
-        pg = await ctx.new_page()
-        await pg.goto(f'{BASE}?lang=ko&day=drone&t=1930&fresh=1#/call', wait_until='domcontentloaded')
+        ctx, pg = await open_page(b, f'{BASE}?lang=ko&day=drone&t=1930&fresh=1#/call')
         await settle(pg)
         await pg.fill('#flight', 'OZ8961')
         await pg.click('text=공항 셔틀 예약')
@@ -67,9 +71,17 @@ async def main():
         await pg.evaluate('window.scrollTo(0,0)')
         await pg.wait_for_timeout(4000)
         await pg.screenshot(path=f'{OUT}/trips_ko.png')
-        await pg.screenshot(path=f'{OUT}/trips_ko_full.png', full_page=True)
-        print('trips_ko done', flush=True)
+        print('trips_ko', flush=True)
         await ctx.close()
+        # control dashboard (desktop, Korean)
+        for name, day, t in (('dash_drone', 'drone', '1930'), ('dash_cruise', 'cruise', '1100')):
+            ctx, pg = await open_page(b, f'{BASE}?day={day}&t={t}&fresh=1#/control', 1440, 900, 2)
+            await pg.wait_for_load_state('networkidle')
+            await pg.wait_for_timeout(1500)
+            await pg.screenshot(path=f'{OUT}/{name}.png')
+            await pg.screenshot(path=f'{OUT}/{name}_full.png', full_page=True)
+            print(name, flush=True)
+            await ctx.close()
         await b.close()
 
 

@@ -1,7 +1,8 @@
 /**
  * Demo scenarios (virtual demand — NOT measured data).
  * Pilot structure of the plan: airport gateway 2 vehicles + zone A (Haeundae·Gwangalli) 3 + zone B (old town·Yeongdo) 3;
- * on cruise days one A vehicle moves to B in the daytime.
+ * on cruise days one A vehicle moves to B in the daytime and waits at the Yeongdo cruise terminal
+ * (large cruise ships berth there; the North Port terminal takes ferries and smaller ships).
  */
 import type { ZoneParams } from '../engine/drt';
 

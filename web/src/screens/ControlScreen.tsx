@@ -97,7 +97,7 @@ export function ControlScreen() {
             <span className="flabel">운영 레버</span>
             <label className="ftoggle">
               <input type="checkbox" checked={levers.cruiseLend} onChange={(e) => setLevers({ ...levers, cruiseLend: e.target.checked })} />
-              크루즈 입항일 A→B 1대 (09–18시)
+              크루즈 입항일 A→B 1대 (09–18시, 영도 크루즈터미널 대기)
             </label>
             <label className="ftoggle">
               <input type="checkbox" checked={levers.droneSupport} onChange={(e) => setLevers({ ...levers, droneSupport: e.target.checked })} />

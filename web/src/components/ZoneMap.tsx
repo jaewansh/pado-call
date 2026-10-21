@@ -47,6 +47,7 @@ const SHAPES: Record<ZoneId, JSX.Element> = {
         <path d="M236,52 C256,70 272,88 284,106" />
         <path d="M160,118 C130,110 96,104 54,92" />
         <path d="M176,160 C170,172 166,182 168,190 C200,210 250,214 286,212" />
+        <path d="M302,170 C310,174 316,178 318,184 C318,198 304,210 286,212" />
       </g>
       <path d="M176,136 L176,158" stroke="#97a7b7" strokeWidth="3" />
       <path d="M300,118 C308,134 308,152 302,170" stroke="#97a7b7" strokeWidth="2.5" fill="none" />
@@ -62,12 +63,13 @@ const LABEL: Partial<Record<PlaceId, [number, number, 'start' | 'middle' | 'end'
   haeundae: [0, 32, 'middle'],
   dongbaek: [16, 24, 'start'],
   blueline: [10, -18, 'end'],
-  busanstn: [0, -16, 'middle'],
+  busanstn: [-6, -14, 'end'],
   nampo: [-14, -12, 'end'],
   gamcheon: [-14, -18, 'start'],
   huinnyeoul: [-14, 5, 'end'],
-  taejongdae: [0, -20, 'middle'],
-  cruise: [-14, -6, 'end'],
+  taejongdae: [0, 24, 'middle'],
+  ydcruise: [-14, -10, 'end'],
+  cruise: [0, 22, 'middle'],
 };
 
 export interface CrowdMark {

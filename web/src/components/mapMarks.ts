@@ -19,6 +19,7 @@ const LABEL_POS: Record<PlaceId, MapMark['labelPos']> = {
   gamcheon: 'top',
   huinnyeoul: 'left',
   taejongdae: 'top',
+  ydcruise: 'top',
 };
 
 export interface CrowdState {

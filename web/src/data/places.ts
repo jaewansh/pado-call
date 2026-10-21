@@ -6,7 +6,7 @@ export type L10n = Record<Lang, string>;
 
 export type PlaceId =
   | 'gwangalli' | 'millak' | 'centum' | 'haeundae' | 'dongbaek' | 'blueline'
-  | 'busanstn' | 'nampo' | 'gamcheon' | 'huinnyeoul' | 'taejongdae' | 'cruise';
+  | 'busanstn' | 'nampo' | 'gamcheon' | 'huinnyeoul' | 'taejongdae' | 'ydcruise' | 'cruise';
 
 export type Scene = 'coast' | 'city' | 'hill';
 
@@ -139,10 +139,20 @@ export const PLACES: Place[] = [
     pickup: { ko: '태종대 입구 버스 회차지', en: 'Bus turnaround at the Taejongdae entrance', ja: '太宗台入口のバス折り返し場', zhHans: '太宗台入口公交掉头处', zhHant: '太宗臺入口公車迴轉處' },
     crowd: { K: 3500, T: 100, daily: { weekend: 6000, cruise: 7500, drone: 6000 }, profile: { weekend: DAYTIME, cruise: CRUISE_SPOT, drone: DAYTIME }, pop: 0.7 },
   },
+  // Large cruise ships berth at the Yeongdo terminal (Haeyang-ro 301beon-gil 17, Dongsam-dong).
+  // Listed before the North Port terminal so that the extra vehicle of a cruise day waits here.
+  {
+    id: 'ydcruise', zone: 'B', x: 318, y: 184, lat: 35.0808, lng: 129.0792, hub: true,
+    name: { ko: '부산항 국제크루즈터미널(영도)', en: 'Busan Port Cruise Terminal (Yeongdo)', ja: '釜山港国際クルーズターミナル（影島）', zhHans: '釜山港国际邮轮码头（影岛）', zhHant: '釜山港國際郵輪碼頭（影島）' },
+    short: { ko: '영도 크루즈터미널', en: 'Cruise Terminal', ja: 'クルーズターミナル', zhHans: '邮轮码头', zhHant: '郵輪碼頭' },
+    scene: 'coast',
+    pickup: { ko: '터미널 정문 앞 관광버스 승차장 옆, 파란 PADO CALL 표지판', en: 'Tour-bus bay at the terminal main entrance, by the blue PADO CALL sign', ja: 'ターミナル正門前の観光バス乗り場の横、青いPADO CALLの看板', zhHans: '码头正门旅游巴士上车处旁，蓝色 PADO CALL 标牌', zhHant: '碼頭正門遊覽車上車處旁，藍色 PADO CALL 標牌' },
+  },
+  // North Port: ferries to Japan and smaller cruise ships, next to Busan Station.
   {
     id: 'cruise', zone: 'B', x: 284, y: 106, lat: 35.1189, lng: 129.0475, hub: true,
-    name: { ko: '부산항 국제여객터미널(크루즈)', en: 'Busan Port Passenger Terminal (cruise)', ja: '釜山港国際旅客ターミナル（クルーズ）', zhHans: '釜山港国际客运码头（邮轮）', zhHant: '釜山港國際客運碼頭（郵輪）' },
-    short: { ko: '크루즈터미널', en: 'Cruise Terminal', ja: 'クルーズ', zhHans: '邮轮码头', zhHant: '郵輪碼頭' },
+    name: { ko: '부산항 국제여객터미널(북항)', en: 'Busan Port Passenger Terminal (North Port)', ja: '釜山港国際旅客ターミナル（北港）', zhHans: '釜山港国际客运码头（北港）', zhHant: '釜山港國際客運碼頭（北港）' },
+    short: { ko: '국제여객터미널', en: 'Passenger Terminal', ja: '旅客ターミナル', zhHans: '国际客运码头', zhHant: '國際客運碼頭' },
     scene: 'city',
     pickup: { ko: '터미널 1층 도착 로비 3번 게이트', en: 'Arrival lobby, 1F, gate 3', ja: 'ターミナル1階到着ロビー3番ゲート', zhHans: '码头1层到达大厅3号门', zhHant: '碼頭1樓到達大廳3號門' },
   },
@@ -183,7 +193,7 @@ export const ZONE_POLYGONS: Record<ZoneId, [number, number][]> = {
   ],
   B: [
     [129.004, 35.093], [129.005, 35.104], [129.03, 35.125], [129.053, 35.126], [129.056, 35.11], [129.07, 35.09],
-    [129.089, 35.064], [129.086, 35.054], [129.07, 35.056], [129.04, 35.072], [129.025, 35.088], [129.004, 35.093],
+    [129.083, 35.0845], [129.088, 35.077], [129.089, 35.064], [129.086, 35.054], [129.07, 35.056], [129.04, 35.072], [129.025, 35.088], [129.004, 35.093],
   ],
 };
 

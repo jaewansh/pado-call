@@ -222,6 +222,10 @@ interface Box {
   h: number;
 }
 const overlap = (a: Box, b: Box) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+const overlapArea = (a: Box, b: Box) =>
+  Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+/** A label may graze marker dots by this share of its own area when no side is fully free (never other labels). */
+const GRAZE = 0.12;
 const priority = (m: MapMark) =>
   (m.selected ? 100 : 0) + (m.kind === 'pickup' || m.kind === 'dest' || m.kind === 'airport' || m.kind === 'hotel' ? 80 : 0) + (m.kind === 'crowd' && !m.dim ? 10 : 0);
 
@@ -252,6 +256,7 @@ function layoutLabels(map: MLMap, items: { m: MapMark; el: HTMLElement }[]) {
     const pref: Side = it.m.labelPos ?? 'bottom';
     let chosen: Side = pref;
     let chosenBox: Box | null = null;
+    let graze: { s: Side; b: Box; area: number } | null = null;
     for (const s of [pref, ...SIDES.filter((x) => x !== pref)]) {
       const b: Box =
         s === 'bottom' ? { x: p.x - w / 2, y: p.y + gap, w, h }
@@ -259,12 +264,18 @@ function layoutLabels(map: MLMap, items: { m: MapMark; el: HTMLElement }[]) {
         : s === 'right' ? { x: p.x + gap, y: p.y - h / 2, w, h }
         : { x: p.x - gap - w, y: p.y - h / 2, w, h };
       const inside = b.x >= 2 && b.y >= 2 && b.x + b.w <= W - 2 && b.y + b.h <= H - 2;
-      const hit = placed.some((q) => overlap(q, b)) || dots.some((d, j) => j !== i && overlap(d, b));
-      if (inside && !hit) {
+      if (!inside || placed.some((q) => overlap(q, b))) continue;
+      const area = dots.reduce((a, d, j) => (j !== i ? a + overlapArea(d, b) : a), 0);
+      if (area === 0) {
         chosen = s;
         chosenBox = b;
         break;
       }
+      if (area <= GRAZE * w * h && (!graze || area < graze.area)) graze = { s, b, area };
+    }
+    if (!chosenBox && graze) {
+      chosen = graze.s;
+      chosenBox = graze.b;
     }
     it.el.classList.remove('lab-top', 'lab-bottom', 'lab-left', 'lab-right');
     it.el.classList.add(`lab-${chosen}`);

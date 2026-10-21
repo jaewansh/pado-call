@@ -144,7 +144,7 @@ export function ControlScreen() {
         <div className="dgrid">
           <Panel
             title="시간대별 배치 차량과 필요 차량"
-            sub="막대: 운행 레버를 반영한 배치 차량 · 가로선: 관광 대기 기준을 맞추는 최소 차량(확률분포 계산)"
+            sub="막대: 운행 레버를 반영한 배치 차량 · 가로선: 그 시각까지 배치대로 운행했을 때 관광 대기 기준을 맞추는 최소 차량(확률분포 계산)"
             table={
               <table className="dtable">
                 <thead><tr><th>시간</th><th>A 배치</th><th>A 필요</th><th>A 평균 대기(분)</th><th>B 배치</th><th>B 필요</th><th>B 평균 대기(분)</th></tr></thead>

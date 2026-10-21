@@ -100,3 +100,23 @@ describe('pilot scenario (virtual demand)', () => {
     }
   });
 });
+
+describe('required fleet given the plan', () => {
+  it('never exceeds the plan in hours the plan already serves within the standard, and flags real shortfalls', async () => {
+    const { zoneDay, zoneRequired } = await import('./ops');
+    const { DEFAULT_LEVERS } = await import('../data/scenario');
+    for (const z of ['A', 'B'] as const)
+      for (const d of ['weekend', 'cruise', 'drone'] as const) {
+        const day = zoneDay(z, d, DEFAULT_LEVERS);
+        const req = zoneRequired(z, d, DEFAULT_LEVERS);
+        day.hours.forEach((h, k) => {
+          if (h.meets) expect(req[k].required, `${z} ${d} ${h.hour}h`).toBeLessThanOrEqual(h.fleet);
+        });
+      }
+    // cruise day without lending a vehicle to zone B: some daytime hours need a 4th vehicle
+    const noLend = { ...DEFAULT_LEVERS, cruiseLend: false };
+    const day = zoneDay('B', 'cruise', noLend);
+    const req = zoneRequired('B', 'cruise', noLend);
+    expect(day.hours.some((h, k) => req[k].required > h.fleet)).toBe(true);
+  });
+});

@@ -2,7 +2,7 @@
  * Facade between the engines and the UI: memoised runs for a demo day, ride quotes, crowd and
  * dispersal results. Every number here is computed in the browser from virtual demo inputs.
  */
-import { requiredFleetByHour, simulateDay, waitSummary, type DayResult } from './drt';
+import { requiredFleetGivenPlan, simulateDay, waitSummary, type DayResult } from './drt';
 import { crowdForecast, type CrowdForecast, type Site } from './crowd';
 import { dispersal, type Dispersal } from './choice';
 import { gatewayKpis, planGateway, executeGateway, syntheticBookings, type GatewayPlan, type ExecStats } from './airport';
@@ -28,11 +28,9 @@ export function zoneDay(z: ZoneId, d: DayType, lv: Levers = DEFAULT_LEVERS): Day
   });
 }
 
+/** Vehicles each hour needs to meet the standard, given the planned operation up to that hour. */
 export function zoneRequired(z: ZoneId, d: DayType, lv: Levers = DEFAULT_LEVERS) {
-  return cached(`req:${z}:${d}:${lv.preBook.toFixed(2)}`, () => {
-    const [o, c] = SERVICE_HOURS[z];
-    return requiredFleetByHour(ZONE_PARAMS[z], o, c, (t) => lamEff(z, d, t, lv), 8);
-  });
+  return cached(`req:${z}:${d}:${leverKey(lv)}`, () => requiredFleetGivenPlan(ZONE_PARAMS[z], zoneDay(z, d, lv), 8));
 }
 
 export interface RideQuote {

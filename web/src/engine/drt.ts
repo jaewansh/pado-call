@@ -250,6 +250,42 @@ export function simulateDay(
   };
 }
 
+/**
+ * Fewest vehicles that keep each hour within the standard, given the planned operation until that hour:
+ * the queue carried into the hour is the one the plan produced, so an hour the plan already serves
+ * within the standard never needs more vehicles than the plan has.
+ */
+export function requiredFleetGivenPlan(
+  p: ZoneParams,
+  day: DayResult,
+  maxFleet = 8,
+  std: ServiceStandard = TOURIST_STANDARD,
+  queueCap = 45,
+): { hour: number; required: number }[] {
+  const N = maxFleet + queueCap;
+  return day.hours.map((h) => {
+    const idx: number[] = [];
+    for (let t = Math.max(day.open, h.hour * 60); t < Math.min(day.close, (h.hour + 1) * 60); t++) idx.push(t - day.open);
+    const wsum = idx.reduce((s, i) => s + day.lam[i], 0);
+    const start = day.dist[idx[0]];
+    for (let M = 1; M <= maxFleet; M++) {
+      let pv: Float64Array = new Float64Array(N + 1);
+      pv.set(start.subarray(0, Math.min(start.length, N + 1)));
+      const dr = deathRates(p, M, N);
+      let mean = 0;
+      let p30 = 0;
+      for (const i of idx) {
+        const w = wsum > 0 ? day.lam[i] / wsum : 1 / idx.length;
+        mean += w * waitMean(p, pv, M);
+        p30 += w * waitTail(p, pv, M, std.tailMin);
+        pv = stepForward(pv, day.lam[i], dr);
+      }
+      if (mean <= std.meanMax && p30 <= std.tailProb) return { hour: h.hour, required: M };
+    }
+    return { hour: h.hour, required: maxFleet + 1 };
+  });
+}
+
 /** Wait summary for one arrival minute (for the Call screen). */
 export function waitSummary(p: ZoneParams, day: DayResult, minuteOfDay: number) {
   const i = Math.min(Math.max(minuteOfDay - day.open, 0), day.dist.length - 1);

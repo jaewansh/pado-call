@@ -99,12 +99,12 @@ const S = {
   'ride.waitLabel': { ko: '지금 부르면 대기시간', en: 'Pickup wait if you call now', ja: '今呼んだ場合の待ち時間', zhHans: '现在叫车的等候时间', zhHant: '現在叫車的等候時間' },
   'ride.heroSub': {
     ko: '10번 중 9번은 이 시간 안에 승차 · 평균 {a}',
-    en: '9 in 10 calls are picked up within this time · average {a}',
+    en: '9 in 10 calls are picked up by then · average\u00a0{a}',
     ja: '10回中9回はこの時間内に乗車 · 平均{a}',
     zhHans: '10次中有9次在此时间内上车 · 平均{a}',
     zhHant: '10次中有9次在此時間內上車 · 平均{a}',
   },
-  'ride.within': { ko: '{m} 안', en: 'within {m}', ja: '{m}以内', zhHans: '{m}内', zhHant: '{m}內' },
+  'ride.within': { ko: '{m} 이내', en: 'within {m}', ja: '{m}以内', zhHans: '{m}内', zhHant: '{m}內' },
   'ride.fleet': { ko: '이 권역 운행 차량 {n}대', en: '{n} shuttles running in this zone', ja: 'このエリアで運行中 {n}台', zhHans: '本区运行车辆 {n}辆', zhHant: '本區行駛車輛 {n}輛' },
   'ride.trip': { ko: '이동 약 {m} · {t}쯤 도착', en: 'Ride about {m} · arrive around {t}', ja: '乗車 約{m} · {t}ごろ到着', zhHans: '车程约{m} · 约{t}到达', zhHant: '車程約{m} · 約{t}抵達' },
   'ride.crowd': { ko: '{t}쯤 {place}: {level}', en: '{place} around {t}: {level}', ja: '{t}ごろの{place}：{level}', zhHans: '约{t}的{place}：{level}', zhHant: '約{t}的{place}：{level}' },
@@ -202,7 +202,7 @@ export function fmtMin(m: number, lang: Lang): string {
     case 'ja': return `${n}分`;
     case 'zhHans': return `${n}分钟`;
     case 'zhHant': return `${n}分鐘`;
-    default: return `${n} min`;
+    default: return `${n}\u00a0min`;
   }
 }
 

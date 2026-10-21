@@ -250,6 +250,15 @@ function matchPlace(text: string): PlaceId | null {
   return null;
 }
 
+/** "Picked up within N minutes" in words (the big number is the 90% wait). */
+const WAIT_HERO: Record<Lang, { lead?: string; unit: string }> = {
+  ko: { unit: '분 이내' },
+  en: { lead: 'within', unit: 'min' },
+  ja: { unit: '分以内' },
+  zhHans: { unit: '分钟内' },
+  zhHant: { unit: '分鐘內' },
+};
+
 function RideNow() {
   const { lang, day, clock, levers, route, addTrip, showToast, go } = useApp();
   const initTo = (route.params.get('to') as PlaceId | null) ?? 'gwangalli';
@@ -373,9 +382,9 @@ function RideNow() {
         <div className="card" aria-live="polite">
           <h3>{t('ride.waitLabel', lang)}</h3>
           <div className="hero">
-            <span className="lead">≤</span>
+            {WAIT_HERO[lang].lead ? <span className="lead">{WAIT_HERO[lang].lead}</span> : null}
             <span className="num">{Math.round(q.q90)}</span>
-            <span className="unit">{fmtMin(q.q90, lang).replace(/^\d+\s?/, '')}</span>
+            <span className="unit">{WAIT_HERO[lang].unit}</span>
           </div>
           <div className="sub ink">{t('ride.heroSub', lang, { a: fmtMin(q.mean, lang) })}</div>
           <TideGauge p10={q.p10} p20={q.p20} p30={q.p30} lang={lang} />

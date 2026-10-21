@@ -83,7 +83,7 @@ function AirportArrive() {
   };
   return (
     <>
-      <RealMap lang={lang} ariaLabel={t('call.arr', lang)} aspect="16 / 9" marks={airportMarks(area, lang)} line={airportLine(area)} lineColor="#c07a00" fitTo={airportFit(area)} />
+      <RealMap lang={lang} ariaLabel={t('call.arr', lang)} aspect="16 / 9" marks={airportMarks(area, lang)} line={airportLine(area, 'arr')} lineColor="#c07a00" fitTo={airportFit(area, 'arr')} />
       <div className="card">
         <div className="grid2">
           <div className="field">
@@ -187,7 +187,7 @@ function AirportLeave() {
   };
   return (
     <>
-      <RealMap lang={lang} ariaLabel={t('call.dep', lang)} aspect="16 / 9" marks={airportMarks(area, lang)} line={airportLine(area)} lineColor="#c07a00" fitTo={airportFit(area)} />
+      <RealMap lang={lang} ariaLabel={t('call.dep', lang)} aspect="16 / 9" marks={airportMarks(area, lang)} line={airportLine(area, 'dep')} lineColor="#c07a00" fitTo={airportFit(area, 'dep')} />
       <div className="card">
         <div className="grid2">
           <div className="field">

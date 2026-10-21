@@ -1,5 +1,6 @@
 /** Builders for the markers of the real map (positions are real WGS84 coordinates). */
-import { AIRPORT, areaById, placesInZone, type AreaId, type Lang, type PlaceId } from '../data/places';
+import { AIRPORT, areaById, placesInZone, type AreaId, type Lang, type Place, type PlaceId } from '../data/places';
+import { roadRoute } from '../data/routes';
 import type { ZoneId } from '../data/scenario';
 import { CI_COLORS, ciLevel } from '../engine/crowd';
 import { fmtCi } from '../i18n/strings';
@@ -67,8 +68,11 @@ export function rideMarks(zone: ZoneId, lang: Lang, from: PlaceId, to: PlaceId, 
   return [...vanMarks(zone, vans), ...places];
 }
 
-export function rideLine(from: { lng: number; lat: number }, to: { lng: number; lat: number }): [number, number][] {
-  return curve([from.lng, from.lat], [to.lng, to.lat], 0.16);
+/** Ride route along real roads (precomputed), joined to both markers; a gentle curve if no route is stored. */
+export function rideLine(from: Place, to: Place): [number, number][] {
+  const r = roadRoute(from.id, to.id);
+  if (!r) return curve([from.lng, from.lat], [to.lng, to.lat], 0.16);
+  return [[from.lng, from.lat], ...r.line, [to.lng, to.lat]];
 }
 
 const AIRPORT_NAME: Record<Lang, string> = { ko: '김해공항', en: 'Gimhae Airport', ja: '金海空港', zhHans: '金海机场', zhHant: '金海機場' };
@@ -82,15 +86,17 @@ export function airportMarks(area: AreaId, lang: Lang): MapMark[] {
   ];
 }
 
-export function airportLine(area: AreaId): [number, number][] {
+/** Airport ↔ hotel area along real roads ('arr' airport → hotel, 'dep' hotel → airport). */
+export function airportLine(area: AreaId, dir: 'arr' | 'dep'): [number, number][] {
   const a = areaById(area);
-  return curve([AIRPORT.lng, AIRPORT.lat], [a.lng, a.lat], -0.12, 40);
+  const ap: [number, number] = [AIRPORT.lng, AIRPORT.lat];
+  const hotel: [number, number] = [a.lng, a.lat];
+  const r = dir === 'arr' ? roadRoute('airport', `area:${area}`) : roadRoute(`area:${area}`, 'airport');
+  if (!r) return dir === 'arr' ? curve(ap, hotel, -0.12, 40) : curve(hotel, ap, 0.12, 40);
+  return dir === 'arr' ? [ap, ...r.line, hotel] : [hotel, ...r.line, ap];
 }
 
-export function airportFit(area: AreaId): [number, number][] {
-  const a = areaById(area);
-  return [
-    [AIRPORT.lng, AIRPORT.lat],
-    [a.lng, a.lat],
-  ];
+/** Frame the whole route, not only its two ends. */
+export function airportFit(area: AreaId, dir: 'arr' | 'dep'): [number, number][] {
+  return airportLine(area, dir);
 }

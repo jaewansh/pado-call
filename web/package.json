@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "fixtures": "tsx scripts/make_fixtures.ts",
-    "report": "tsx scripts/report.ts"
+    "report": "tsx scripts/report.ts",
+    "routes": "tsx scripts/fetch_routes.ts"
   },
   "dependencies": {
     "maplibre-gl": "^6.15.0",

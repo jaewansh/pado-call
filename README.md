@@ -85,7 +85,7 @@ $$P_u(a\mid t)=\frac{\exp\left(V_{ua}-\theta\,\widehat{CI}_a(t+\Delta)\right)}{\
 | 분류 | 기술 |
 |---|---|
 | 관광객 앱·대시보드 | React 18, TypeScript, Vite, PWA(매니페스트·서비스 워커) |
-| 지도 | MapLibre GL JS, OpenFreeMap 벡터 타일(OpenStreetMap 데이터, API 키 불필요), 오프라인 개략도 대체 |
+| 지도 | MapLibre GL JS, OpenFreeMap 벡터 타일(OpenStreetMap 데이터, API 키 불필요), 실제 도로 경로(OSRM으로 미리 계산), 오프라인 개략도 대체 |
 | 수리 엔진 | TypeScript — 브라우저에서 실행 (`web/src/engine`) |
 | 참조 엔진·API | Python, NumPy, SciPy, FastAPI (`engine-py`) |
 | 테스트 | Vitest 33개, pytest 15개(TypeScript 결과와 수치 교차 검증), Playwright 화면 점검 |
@@ -156,10 +156,11 @@ pado-call/
 ├─ docs/            GitHub Pages가 서비스하는 빌드 결과물 (npm run build로 생성)
 ├─ web/             앱 소스
 │  ├─ src/engine/   수리 엔진: drt · crowd · choice · airport (+ 테스트)
-│  ├─ src/data/     가상 시나리오: 권역·명소·수요
+│  ├─ src/data/     가상 시나리오: 권역·명소·수요, 도로 경로(routes.json)
 │  ├─ src/screens/  Call · Wave · Trips · 관제 대시보드 · 수리모형
-│  └─ scripts/      시나리오 수치 보고서, 참조 엔진용 데이터 내보내기
+│  └─ scripts/      시나리오 수치 보고서, 참조 엔진용 데이터 내보내기, 도로 경로 계산
 ├─ engine-py/       Python 참조 엔진, 교차 검증 테스트, FastAPI 서버
+├─ .github/workflows/routes.yml  도로 경로 다시 계산 + 빌드 (Actions에서 수동 실행)
 ├─ image/           README 이미지
 └─ GUIDE_GITHUB.md  GitHub 업로드·확인 방법
 ```
@@ -175,7 +176,10 @@ npm run dev        # http://localhost:5173 에서 개발 서버
 npm test           # 엔진 테스트
 npm run build      # docs/ 폴더 갱신 (GitHub Pages 배포용)
 npm run report     # 시나리오 수치 요약 (권역 q, 필요 차량, 공항 정시율, 혼잡 분산)
+npm run routes     # 도로 경로 다시 계산 (인터넷 필요, 명소를 바꾼 뒤 실행)
 ```
+
+지도 위 이동 경로는 명소 쌍마다 미리 계산해 `web/src/data/routes.json`에 넣어 두므로, 시연 중에는 경로 서버에 접속하지 않습니다. 명소를 추가·변경했다면 GitHub의 Actions → **road routes** → Run workflow로 경로 계산과 빌드를 한 번에 다시 할 수 있습니다.
 
 **Python 참조 엔진** (Python 3.10 이상)
 
@@ -190,6 +194,7 @@ uvicorn padocall.api:app --reload       # http://127.0.0.1:8000/docs 에서 API 
 
 - 차량 수·요금·수요·관측값은 기획안의 가정치와 시연용 가상 데이터입니다. 지도 위 운행 권역 경계와 승차 위치는 개략 위치입니다.
 - 지도: © OpenStreetMap contributors, © OpenMapTiles, OpenFreeMap.
+- 이동 경로: OSRM 자동차 경로(OpenStreetMap 도로 데이터, ODbL)를 미리 계산해 사용합니다. 셔틀 이동 시간은 이 도로 거리를 권역 평균 속도(시속 18 km)로 나눈 값에 승차 1분을 더한 가정치입니다.
 - [1] 신재완·김민수(2026), 「부산시 저수요 시내버스 운행의 수요응답형 교통 전환 조건: 1분 단위 정류장 수요 재구성과 Kolmogorov 전진방정식 모형」, 대한교통학회지 투고 원고. 이 저장소에는 [1]의 데이터·보정 결과가 포함되어 있지 않습니다.
 
 ## 팀원

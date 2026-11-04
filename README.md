@@ -32,7 +32,7 @@
 
 ![시연 영상](./image/demo.gif)
 
-▶ [고화질 MP4 영상 (1920×1080 · 36초)](./image/demo.mp4)
+▶ [고화질 MP4 영상 내려받기 (1920×1080 · 36초)](./image/demo.mp4?raw=true)
 
 ---
 

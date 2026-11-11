@@ -66,10 +66,10 @@ body { font-family: 'Pretendard', 'Noto Sans CJK KR', sans-serif; color: #0f2b46
 .ripple { position: absolute; border-radius: 50%; border: 3px solid #00a396; z-index: 9; pointer-events: none; }
 
 /* day wipe */
-#wipe { position: absolute; inset: 0; z-index: 20; background: linear-gradient(120deg, #0f2b46 0%, #0a5560 60%, #00a396 100%); color: #fff; display: flex; flex-direction: column; justify-content: center; padding-left: 210px; transform: translateX(-100%); }
-#wipe .k { font-size: 22px; font-weight: 800; letter-spacing: 4px; color: #8fe6dc; }
+#wipe { position: absolute; inset: 0; z-index: 20; background: linear-gradient(120deg, #0f2b46 0%, #0a5560 60%, #00a396 100%); color: #fff; display: flex; flex-direction: column; justify-content: center; padding-left: 210px; clip-path: inset(0 100% 0 0); }
+#wipe .k { font-size: 24px; font-weight: 800; letter-spacing: 4px; color: #8fe6dc; }
 #wipe .h { margin-top: 18px; font-size: 76px; font-weight: 800; letter-spacing: -1.5px; }
-#wipe .s { margin-top: 18px; font-size: 32px; font-weight: 600; color: #d4e6ef; }
+#wipe .s { margin-top: 20px; font-size: 36px; font-weight: 600; color: #d4e6ef; }
 
 /* end card */
 #end { position: absolute; inset: 0; z-index: 15; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 0; }
@@ -244,15 +244,15 @@ at(1.9, () => {
 });
 // B1 flight number
 const flight = () => D(P.A).querySelector('input[placeholder="e.g. KE 1234"]');
-tap(P.A, 3.75, flight, false);
-at(3.75, () => flight().focus());
-'KE 1234'.split('').forEach((ch, i) => at(3.95 + i * 0.14, () => setVal(P.A, flight(), 'KE 1234'.slice(0, i + 1))));
-at(5.25, () => flight().blur());
+tap(P.A, 3.6, flight, false);
+at(3.6, () => flight().focus());
+'KE 1234'.split('').forEach((ch, i) => at(3.8 + i * 0.14, () => setVal(P.A, flight(), 'KE 1234'.slice(0, i + 1))));
+at(5.1, () => flight().blur());
 // B2 result card
-scrollAnim(P.A, 7.2, 8.5, () => docTop(P.A, D(P.A).querySelector('.card.airport')) - barH(P.A) - 10);
-scrollAnim(P.A, 9.8, 10.6, () => W(P.A).scrollY + 190);
+scrollAnim(P.A, 6.45, 7.75, () => docTop(P.A, D(P.A).querySelector('.card.airport')) - barH(P.A) - 10);
+scrollAnim(P.A, 9.05, 9.85, () => W(P.A).scrollY + 190);
 // B3 next day (under the wipe)
-at(11.85, async () => {
+at(11.1, async () => {
   await load(P.A, URL_DAY2);
   await waitFor(() => D(P.A).querySelector('.alt-item'));
   await mapsReady(P.A);
@@ -262,24 +262,24 @@ at(11.85, async () => {
   await sleep(250);
 });
 // B4 wait time
-scrollAnim(P.A, 13.5, 14.5, () => docTop(P.A, card(P.A, 'Pickup wait')) - barH(P.A) - 10);
+scrollAnim(P.A, 14.3, 15.3, () => docTop(P.A, card(P.A, 'Pickup wait')) - barH(P.A) - 10);
 // B5 crowd at arrival + calmer spot
-scrollAnim(P.A, 17.75, 18.65, () => docTop(P.A, card(P.A, 'Calmer nearby')) - barH(P.A) - 150);
-tap(P.A, 20.45, () => D(P.A).querySelector('.alt-item button'));
+scrollAnim(P.A, 18.55, 19.45, () => docTop(P.A, card(P.A, 'Calmer nearby')) - barH(P.A) - 150);
+tap(P.A, 21.25, () => D(P.A).querySelector('.alt-item button'));
 // B6 where to wait, then call
-scrollAnim(P.A, 22.95, 23.95, () => docTop(P.A, card(P.A, 'Wait here')) - barH(P.A) - 10);
-scrollAnim(P.A, 24.85, 25.45, () => maxScroll(P.A));
-tap(P.A, 26.0, () => [...D(P.A).querySelectorAll('button')].find((b) => b.textContent.includes('Call shuttle')));
+scrollAnim(P.A, 23.75, 24.75, () => docTop(P.A, card(P.A, 'Wait here')) - barH(P.A) - 10);
+scrollAnim(P.A, 25.65, 26.25, () => maxScroll(P.A));
+tap(P.A, 26.8, () => [...D(P.A).querySelectorAll('button')].find((b) => b.textContent.includes('Call shuttle')));
 // B7 pay
-tap(P.A, 27.2, () => D(P.A).querySelectorAll('.pay-opt')[1]);
-tap(P.A, 28.45, () => D(P.A).querySelector('.sheet .btn-primary'));
-at(28.85, async () => {
+tap(P.A, 28.0, () => D(P.A).querySelectorAll('.pay-opt')[1]);
+tap(P.A, 29.25, () => D(P.A).querySelector('.sheet .btn-primary'));
+at(29.65, async () => {
   await waitFor(() => D(P.A).querySelector('.qr-pass'));
   W(P.A).scrollTo(0, 0);
   await sleep(120);
 });
 // B8 QR boarding pass
-scrollAnim(P.A, 30.35, 31.1, () => docTop(P.A, D(P.A).querySelector('.qr-pass')) - barH(P.A) - 54);
+scrollAnim(P.A, 30.85, 31.6, () => docTop(P.A, D(P.A).querySelector('.qr-pass')) - barH(P.A) - 54);
 // driver phone, loaded off screen
 at(32.0, async () => {
   const href = D(P.A).querySelector('.demo-link').getAttribute('href');
@@ -305,14 +305,14 @@ Q.sort((a, b) => a.t - b.t);
 
 // ---------------------------------------------------------------- captions
 const BEATS = [
-  { t0: 0.0, t1: 3.3, tone: 'amber', chip: 'DAY 1 · FRIDAY 15:00 · BEFORE THE FLIGHT', en: 'It opens in <em>my language</em> —<br>no app to install, no sign-up', ko: '앱 설치·회원가입 없이, 내 언어로 시작' },
-  { t0: 3.3, t1: 7.0, tone: 'amber', chip: 'DAY 1 · FRIDAY 15:00 · BEFORE THE FLIGHT', en: 'I book my <em>airport shuttle</em><br>before I fly', ko: '비행기 타기 전에 김해공항 셔틀을 예약' },
-  { t0: 7.0, t1: 11.45, tone: 'amber', chip: 'DAY 1 · LANDING AT GIMHAE 20:00', en: 'It tells me <em>when we leave</em> —<br>and when I reach my hotel', ko: '짐 찾고 20:25 출발 · 10번 중 9번은 21:22까지 숙소 도착' },
-  { t0: 12.6, t1: 17.6, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Off to Gwangalli —<br>I see <em>the wait</em> before I call', ko: '부르기 전에 대기시간을 확률로 · 10번 중 9번은 16분 안에 승차' },
-  { t0: 17.6, t1: 22.8, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Gwangalli will be packed,<br>so it suggests <em>a calmer spot</em>', ko: '드론쇼 날 광안리는 혼잡 — 덜 붐비는 센텀시티를 추천' },
-  { t0: 22.8, t1: 26.4, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'It even shows<br><em>exactly where to wait</em>', ko: '타는 곳은 사진으로 안내' },
-  { t0: 26.4, t1: 30.2, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'I pay my own way —<br><em>charged only when I board</em>', ko: '해외 카드·간편결제 · 부를 때는 승인만, 탈 때 결제 확정' },
-  { t0: 30.2, t1: 33.6, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'My <em>one-time QR</em><br>is the ticket', ko: '1회용 QR 탑승권이 바로 발급' },
+  { t0: 0.0, t1: 3.15, tone: 'amber', chip: 'DAY 1 · FRIDAY 15:00 · BEFORE THE FLIGHT', en: 'It opens in <em>my language</em> —<br>no app to install, no sign-up', ko: '앱 설치·회원가입 없이, 내 언어로 시작' },
+  { t0: 3.15, t1: 6.25, tone: 'amber', chip: 'DAY 1 · FRIDAY 15:00 · BEFORE THE FLIGHT', en: 'I book my <em>airport shuttle</em><br>before I fly', ko: '비행기 타기 전에 김해공항 셔틀을 예약' },
+  { t0: 6.25, t1: 10.7, tone: 'amber', chip: 'DAY 1 · LANDING AT GIMHAE 20:00', en: 'It tells me <em>when we leave</em> —<br>and when I reach my hotel', ko: '짐 찾고 20:25 출발 · 10번 중 9번은 21:22까지 숙소 도착' },
+  { t0: 13.4, t1: 18.4, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Off to Gwangalli —<br>I see <em>the wait</em> before I call', ko: '부르기 전에 대기시간을 확률로 · 10번 중 9번은 16분 안에 승차' },
+  { t0: 18.4, t1: 23.6, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Gwangalli will be packed,<br>so it suggests <em>a calmer spot</em>', ko: '드론쇼 날 광안리는 혼잡 — 덜 붐비는 센텀시티를 추천' },
+  { t0: 23.6, t1: 27.2, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'It even shows<br><em>exactly where to wait</em>', ko: '타는 곳은 사진으로 안내' },
+  { t0: 27.2, t1: 30.7, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'I pay my own way —<br><em>charged only when I board</em>', ko: '해외 카드·간편결제 · 부를 때는 승인만, 탈 때 결제 확정' },
+  { t0: 30.7, t1: 33.6, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'My <em>one-time QR</em><br>is the ticket', ko: '1회용 QR 탑승권이 바로 발급' },
   { t0: 34.3, t1: DUR, tone: 'teal', chip: 'BOARDING · 19:38', narrow: true, en: 'The driver scans it — and the app <em>greets me in English</em>', ko: '기사 앱은 QR 확인 후 승객 언어로 인사' },
 ];
 const cap = document.getElementById('cap');
@@ -389,12 +389,14 @@ function renderScan(t) {
 }
 const wipe = document.getElementById('wipe');
 function renderWipe(t) {
-  let x = -100;
-  if (t >= 11.45 && t < 11.8) x = -100 + 100 * ease((t - 11.45) / 0.35);
-  else if (t >= 11.8 && t < 12.25) x = 0;
-  else if (t >= 12.25 && t < 12.6) x = 100 * ease((t - 12.25) / 0.35);
-  else if (t >= 12.6) x = 100;
-  wipe.style.transform = `translateX(${x}%)`;
+  // day card: wipes in 0.35 s, stays fully readable for 2.0 s, wipes out 0.35 s; its text does not move
+  const T0 = 10.7, IN = 0.35, HOLD = 2.0, OUT = 0.35;
+  let l = 0, r = 100;
+  if (t >= T0 && t < T0 + IN) r = 100 - 100 * ease((t - T0) / IN);
+  else if (t >= T0 + IN && t < T0 + IN + HOLD) r = 0;
+  else if (t >= T0 + IN + HOLD && t < T0 + IN + HOLD + OUT) { r = 0; l = 100 * ease((t - T0 - IN - HOLD) / OUT); }
+  else if (t >= T0 + IN + HOLD + OUT) { r = 0; l = 100; }
+  wipe.style.clipPath = `inset(0 ${r}% 0 ${l}%)`;
 }
 const lblA = document.getElementById('lblA'), lblB = document.getElementById('lblB');
 function renderLayout(t) {

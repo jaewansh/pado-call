@@ -64,7 +64,7 @@ async def run(probe: bool, check: list[float] | None = None, blank: bool = False
                 await pg.screenshot(path=str(FR / f'f{f:04d}.jpg'), type='jpeg', quality=94)
                 if f % 150 == 0:
                     print(f'frame {f} / {n}  {time.time() - t0:.0f}s', flush=True)
-                if f in (int(1.5 * FPS), int(13.0 * FPS)):  # airport map, Day 2 ride map
+                if f in (int(1.5 * FPS), int(12.0 * FPS), int(14.0 * FPS)):  # airport map, day card, Day 2 ride map
                     await pg.screenshot(path=str(OUT / f'check_{f / FPS:04.1f}s.png'))
             print('map state at the end:', await pg.evaluate('mapState()'), flush=True)
             if errors:

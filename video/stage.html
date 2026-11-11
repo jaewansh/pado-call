@@ -262,13 +262,13 @@ at(11.1, async () => {
   await sleep(250);
 });
 // B4 wait time
-scrollAnim(P.A, 14.3, 15.3, () => docTop(P.A, card(P.A, 'Pickup wait')) - barH(P.A) - 10);
+scrollAnim(P.A, 14.8, 15.8, () => docTop(P.A, card(P.A, 'Pickup wait')) - barH(P.A) - 10);
 // B5 crowd at arrival + calmer spot
-scrollAnim(P.A, 18.55, 19.45, () => docTop(P.A, card(P.A, 'Calmer nearby')) - barH(P.A) - 150);
-tap(P.A, 21.25, () => D(P.A).querySelector('.alt-item button'));
+scrollAnim(P.A, 19.05, 19.95, () => docTop(P.A, card(P.A, 'Calmer nearby')) - barH(P.A) - 150);
+tap(P.A, 21.75, () => D(P.A).querySelector('.alt-item button'));
 // B6 where to wait, then call
-scrollAnim(P.A, 23.75, 24.75, () => docTop(P.A, card(P.A, 'Wait here')) - barH(P.A) - 10);
-scrollAnim(P.A, 25.65, 26.25, () => maxScroll(P.A));
+scrollAnim(P.A, 24.25, 25.25, () => docTop(P.A, card(P.A, 'Wait here')) - barH(P.A) - 10);
+scrollAnim(P.A, 25.75, 26.3, () => maxScroll(P.A));
 tap(P.A, 26.8, () => [...D(P.A).querySelectorAll('button')].find((b) => b.textContent.includes('Call shuttle')));
 // B7 pay
 tap(P.A, 28.0, () => D(P.A).querySelectorAll('.pay-opt')[1]);
@@ -308,9 +308,9 @@ const BEATS = [
   { t0: 0.0, t1: 3.15, tone: 'amber', chip: 'DAY 1 · FRIDAY 15:00 · BEFORE THE FLIGHT', en: 'It opens in <em>my language</em> —<br>no app to install, no sign-up', ko: '앱 설치·회원가입 없이, 내 언어로 시작' },
   { t0: 3.15, t1: 6.25, tone: 'amber', chip: 'DAY 1 · FRIDAY 15:00 · BEFORE THE FLIGHT', en: 'I book my <em>airport shuttle</em><br>before I fly', ko: '비행기 타기 전에 김해공항 셔틀을 예약' },
   { t0: 6.25, t1: 10.7, tone: 'amber', chip: 'DAY 1 · LANDING AT GIMHAE 20:00', en: 'It tells me <em>when we leave</em> —<br>and when I reach my hotel', ko: '짐 찾고 20:25 출발 · 10번 중 9번은 21:22까지 숙소 도착' },
-  { t0: 13.4, t1: 18.4, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Off to Gwangalli —<br>I see <em>the wait</em> before I call', ko: '부르기 전에 대기시간을 확률로 · 10번 중 9번은 16분 안에 승차' },
-  { t0: 18.4, t1: 23.6, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Gwangalli will be packed,<br>so it suggests <em>a calmer spot</em>', ko: '드론쇼 날 광안리는 혼잡 — 덜 붐비는 센텀시티를 추천' },
-  { t0: 23.6, t1: 27.2, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'It even shows<br><em>exactly where to wait</em>', ko: '타는 곳은 사진으로 안내' },
+  { t0: 13.9, t1: 18.9, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Off to Gwangalli —<br>I see <em>the wait</em> before I call', ko: '부르기 전에 대기시간을 확률로 · 10번 중 9번은 16분 안에 승차' },
+  { t0: 18.9, t1: 24.1, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Gwangalli will be packed,<br>so it suggests <em>a calmer spot</em>', ko: '드론쇼 날 광안리는 혼잡 — 덜 붐비는 센텀시티를 추천' },
+  { t0: 24.1, t1: 27.2, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'It even shows<br><em>exactly where to wait</em>', ko: '타는 곳은 사진으로 안내' },
   { t0: 27.2, t1: 30.7, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'I pay my own way —<br><em>charged only when I board</em>', ko: '해외 카드·간편결제 · 부를 때는 승인만, 탈 때 결제 확정' },
   { t0: 30.7, t1: 33.6, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'My <em>one-time QR</em><br>is the ticket', ko: '1회용 QR 탑승권이 바로 발급' },
   { t0: 34.3, t1: DUR, tone: 'teal', chip: 'BOARDING · 19:38', narrow: true, en: 'The driver scans it — and the app <em>greets me in English</em>', ko: '기사 앱은 QR 확인 후 승객 언어로 인사' },
@@ -389,8 +389,8 @@ function renderScan(t) {
 }
 const wipe = document.getElementById('wipe');
 function renderWipe(t) {
-  // day card: wipes in 0.35 s, stays fully readable for 2.0 s, wipes out 0.35 s; its text does not move
-  const T0 = 10.7, IN = 0.35, HOLD = 2.0, OUT = 0.35;
+  // day card: wipes in 0.35 s, stays fully readable for 2.5 s, wipes out 0.35 s; its text does not move
+  const T0 = 10.7, IN = 0.35, HOLD = 2.5, OUT = 0.35;
   let l = 0, r = 100;
   if (t >= T0 && t < T0 + IN) r = 100 - 100 * ease((t - T0) / IN);
   else if (t >= T0 + IN && t < T0 + IN + HOLD) r = 0;

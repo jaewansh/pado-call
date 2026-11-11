@@ -1,0 +1,38 @@
+# Temporary: records the foreign-visitor demo video with the real OpenFreeMap map
+# and commits the MP4 back to this branch. The branch is deleted after the video is collected.
+name: record demo video
+on:
+  push:
+    branches: [video-render]
+    paths: ['video/**', '.github/workflows/video.yml']
+permissions:
+  contents: write
+jobs:
+  record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ffmpeg, fonts, Playwright
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-noto-cjk
+          mkdir -p ~/.local/share/fonts && cp video/fonts/*.otf ~/.local/share/fonts/ && fc-cache -f >/dev/null
+          pip install -q playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Record
+        run: |
+          set -o pipefail
+          mkdir -p video/out
+          python video/record.py 2>&1 | tee video/out/render.log
+      - name: Commit the result
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add video/out
+          git commit -m "녹화 결과 (실제 지도)" || echo "nothing to commit"
+          git push

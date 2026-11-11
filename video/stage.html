@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PADO CALL — a visitor's view</title>
+<style>
+@font-face { font-family: 'Pretendard'; font-weight: 400; src: url('fonts/Pretendard-Regular.otf'); }
+@font-face { font-family: 'Pretendard'; font-weight: 500; src: url('fonts/Pretendard-Medium.otf'); }
+@font-face { font-family: 'Pretendard'; font-weight: 600; src: url('fonts/Pretendard-SemiBold.otf'); }
+@font-face { font-family: 'Pretendard'; font-weight: 700; src: url('fonts/Pretendard-Bold.otf'); }
+@font-face { font-family: 'Pretendard'; font-weight: 800; src: url('fonts/Pretendard-ExtraBold.otf'); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1680px; height: 945px; overflow: clip; background: #e3f1f0; }
+body { font-family: 'Pretendard', 'Noto Sans CJK KR', sans-serif; color: #0f2b46; -webkit-font-smoothing: antialiased; word-break: keep-all; }
+#stage { position: relative; width: 1680px; height: 945px; overflow: clip; background: linear-gradient(135deg, #e3f4f1 0%, #dbe9f5 100%); }
+.circle { position: absolute; left: -130px; top: -80px; width: 1100px; height: 1100px; border-radius: 50%; background: #fff; }
+.circle2 { position: absolute; left: 1180px; top: 600px; width: 700px; height: 700px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
+.brand { position: absolute; right: 64px; top: 44px; display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 800; color: #0f2b46; letter-spacing: 0.3px; }
+.brand b { color: #00a396; }
+
+/* caption column */
+#cap { position: absolute; left: 730px; width: 860px; top: 50%; transform: translateY(-50%); }
+#cap .chip { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 800; letter-spacing: 2.2px; color: #0f2b46; background: #fff; border-radius: 999px; padding: 9px 18px 9px 14px; box-shadow: 0 4px 14px rgba(15, 43, 70, 0.08); white-space: nowrap; }
+#cap .chip i { width: 12px; height: 12px; border-radius: 50%; background: #00a396; display: block; }
+#cap .chip.amber i { background: #d48806; }
+#cap h1 { margin-top: 26px; font-size: 54px; line-height: 1.2; font-weight: 800; letter-spacing: -1.2px; color: #0f2b46; }
+#cap h1 em { font-style: normal; color: #007e74; }
+#cap.amber h1 em { color: #b26a00; }
+#cap .ko { margin-top: 22px; font-size: 28px; line-height: 1.45; font-weight: 600; color: #4d5b6b; letter-spacing: -0.3px; }
+#cap.narrow h1 { font-size: 44px; }
+#cap.narrow .ko { font-size: 25px; }
+.progress { position: absolute; left: 730px; width: 860px; bottom: 70px; height: 5px; border-radius: 3px; background: rgba(15, 43, 70, 0.1); overflow: hidden; }
+.progress b { display: block; height: 100%; width: 0; background: #00a396; border-radius: 3px; }
+.note { position: absolute; right: 90px; bottom: 30px; font-size: 15px; font-weight: 500; color: #7a8796; }
+
+/* phones: device box 424.24 x 875.65, screen 393 x 850.5 at (15.41, 12.57) */
+.phone { position: absolute; top: 34.7px; width: 424.24px; height: 875.65px; filter: drop-shadow(0 28px 36px rgba(15, 43, 70, 0.28)); }
+.phone .scr { position: absolute; left: 14.9px; top: 12.1px; width: 394px; height: 852px; overflow: clip; border-radius: 60px; background: #fff; }
+.phone iframe { width: 394px; height: 852px; border: 0; display: block; background: #fff; }
+.phone .sbar { position: absolute; left: 15.41px; top: 12.57px; width: 393px; height: 47px; pointer-events: none; }
+.phone .sbar .tm { position: absolute; left: 0; width: 137px; top: 21px; text-align: center; font-size: 17px; font-weight: 600; letter-spacing: -0.2px; color: #111; line-height: 20px; }
+.phone .sbar .ic { position: absolute; left: 257px; width: 136px; top: 24px; display: flex; justify-content: center; align-items: center; gap: 6px; }
+.phone .island { position: absolute; left: 152.5px; top: 27.6px; width: 119.6px; height: 34.9px; border-radius: 17.5px; background: #000; }
+.phone img.frame { position: absolute; left: 0; top: 0; width: 424.24px; height: 875.65px; pointer-events: none; }
+.plabel { position: absolute; top: 4px; transform: translateX(-50%); font-size: 15px; font-weight: 800; color: #0f2b46; background: #fff; padding: 5px 14px; border-radius: 999px; box-shadow: 0 3px 10px rgba(15, 43, 70, 0.12); white-space: nowrap; opacity: 0; z-index: 6; }
+
+/* language popover (drawn over the app's native picker) */
+#langpop { position: absolute; width: 200px; background: #fff; border-radius: 16px; box-shadow: 0 18px 44px rgba(15, 43, 70, 0.28), 0 0 0 1px rgba(15, 43, 70, 0.06); padding: 6px; opacity: 0; transform-origin: top right; z-index: 8; }
+#langpop div { display: flex; align-items: center; justify-content: space-between; height: 40px; padding: 0 12px; border-radius: 10px; font-size: 16px; font-weight: 700; color: #0f2b46; }
+#langpop div.on { background: #e6f7f5; color: #007e74; }
+#langpop div.on::after { content: '✓'; font-weight: 800; }
+#langpop .hd { height: 30px; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #7a8796; }
+
+/* QR scan overlay */
+#scan { position: absolute; opacity: 0; z-index: 7; pointer-events: none; }
+#scan .c { position: absolute; width: 30px; height: 30px; border: 5px solid #00c2b0; }
+#scan .c.tl { left: -10px; top: -10px; border-right: 0; border-bottom: 0; border-radius: 10px 0 0 0; }
+#scan .c.tr { right: -10px; top: -10px; border-left: 0; border-bottom: 0; border-radius: 0 10px 0 0; }
+#scan .c.bl { left: -10px; bottom: -10px; border-right: 0; border-top: 0; border-radius: 0 0 0 10px; }
+#scan .c.br { right: -10px; bottom: -10px; border-left: 0; border-top: 0; border-radius: 0 0 10px 0; }
+#scan .ln { position: absolute; left: -6px; right: -6px; height: 4px; border-radius: 2px; background: #00c2b0; box-shadow: 0 0 18px 6px rgba(0, 194, 176, 0.55); }
+#scan .ok { position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%; background: #00a396; color: #fff; font-size: 56px; font-weight: 800; display: flex; align-items: center; justify-content: center; opacity: 0; box-shadow: 0 10px 30px rgba(0, 120, 110, 0.4); }
+
+/* taps */
+.tap { position: absolute; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 50%; background: rgba(255, 255, 255, 0.55); border: 2.5px solid rgba(15, 43, 70, 0.55); box-shadow: 0 4px 14px rgba(15, 43, 70, 0.3); z-index: 9; pointer-events: none; }
+.ripple { position: absolute; border-radius: 50%; border: 3px solid #00a396; z-index: 9; pointer-events: none; }
+
+/* day wipe */
+#wipe { position: absolute; inset: 0; z-index: 20; background: linear-gradient(120deg, #0f2b46 0%, #0a5560 60%, #00a396 100%); color: #fff; display: flex; flex-direction: column; justify-content: center; padding-left: 210px; transform: translateX(-100%); }
+#wipe .k { font-size: 22px; font-weight: 800; letter-spacing: 4px; color: #8fe6dc; }
+#wipe .h { margin-top: 18px; font-size: 76px; font-weight: 800; letter-spacing: -1.5px; }
+#wipe .s { margin-top: 18px; font-size: 32px; font-weight: 600; color: #d4e6ef; }
+
+/* end card */
+#end { position: absolute; inset: 0; z-index: 15; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 0; }
+#end .logo { display: flex; align-items: center; gap: 18px; font-size: 84px; font-weight: 800; letter-spacing: 0.5px; color: #0f2b46; }
+#end .logo b { color: #00a396; }
+#end .en { margin-top: 30px; font-size: 38px; font-weight: 700; color: #0f2b46; letter-spacing: -0.6px; line-height: 1.3; }
+#end .ko { margin-top: 14px; font-size: 30px; font-weight: 600; color: #4d5b6b; }
+#end .langs { margin-top: 34px; display: flex; gap: 12px; }
+#end .langs span { background: #fff; border-radius: 999px; padding: 9px 20px; font-size: 21px; font-weight: 700; color: #0f2b46; box-shadow: 0 4px 14px rgba(15, 43, 70, 0.08); }
+#end .url { margin-top: 38px; font-size: 26px; font-weight: 800; color: #fff; background: #0f2b46; border-radius: 999px; padding: 13px 30px; letter-spacing: 0.3px; }
+#end .ft { margin-top: 22px; font-size: 19px; font-weight: 600; color: #6b7a8b; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="circle"></div><div class="circle2"></div>
+  <div class="brand" id="brand"><svg width="38" height="24" viewBox="0 0 22 14"><path d="M1.5 9 C4 3.5, 7 3.5, 9.5 8.5 S15.5 13.5, 20.5 5.5" stroke="#00A396" stroke-width="3" fill="none" stroke-linecap="round"/></svg><span>PADO <b>CALL</b></span></div>
+
+  <div id="cap"><div class="chip"><i></i><span></span></div><h1></h1><p class="ko"></p></div>
+  <div class="progress"><b id="prog"></b></div>
+  <div class="note" id="note">Demo app · virtual data &nbsp;·&nbsp; 시연판 화면 · 가상 데이터</div>
+
+  <div class="phone" id="phA" style="left:200px">
+    <div class="scr"><iframe id="ifrA" name="ifrA"></iframe></div>
+    <div class="sbar"><div class="tm">15:00</div><div class="ic"></div></div>
+    <div class="island"></div>
+    <img class="frame" src="assets/frame.png" alt="">
+  </div>
+  <div class="phone" id="phB" style="left:1760px">
+    <div class="scr"><iframe id="ifrB" name="ifrB"></iframe></div>
+    <div class="sbar"><div class="tm">19:38</div><div class="ic"></div></div>
+    <div class="island"></div>
+    <img class="frame" src="assets/frame.png" alt="">
+  </div>
+  <div class="plabel" id="lblA">Tourist · English</div>
+  <div class="plabel" id="lblB">Driver · 기사 앱 (한국어)</div>
+
+  <div id="langpop"><div class="hd">LANGUAGE</div><div>한국어</div><div class="on" id="lpEn">English</div><div>日本語</div><div>简体中文</div><div>繁體中文</div></div>
+  <div id="scan"><div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div><div class="ln"></div><div class="ok">✓</div></div>
+  <div id="taps"></div>
+
+  <div id="wipe"><div class="k">NEXT DAY · 다음 날</div><div class="h">Saturday 19:30, Haeundae</div><div class="s">토요일 저녁, 해운대 숙소 앞에서</div></div>
+
+  <div id="end">
+    <div class="logo"><svg width="104" height="66" viewBox="0 0 22 14"><path d="M1.5 9 C4 3.5, 7 3.5, 9.5 8.5 S15.5 13.5, 20.5 5.5" stroke="#00A396" stroke-width="3" fill="none" stroke-linecap="round"/></svg><span>PADO <b>CALL</b></span></div>
+    <div class="en">From the airport to every spot in Busan —<br>call a shuttle in your own language.</div>
+    <div class="ko">공항부터 명소까지, 내 언어로 부르면 오는 관광셔틀</div>
+    <div class="langs"><span>English</span><span>日本語</span><span>简体中文</span><span>繁體中文</span><span>한국어</span></div>
+    <div class="url">jaewansh.github.io/pado-call</div>
+    <div class="ft">2026 글로컬 부산관광 트래블톤 · Track 4 관광 인프라</div>
+  </div>
+</div>
+
+<script>
+const FPS = 30, DUR = 40, SBH = 47;
+const MAPQ = new URLSearchParams(location.search).get('map');
+const BASE = '../docs/?lang=en' + (MAPQ ? '&map=' + MAPQ : '');
+const URL_DAY1 = BASE + '&day=weekday&t=1500#/call';
+const URL_DAY2 = BASE + '&day=drone&t=1930#/call?seg=ride&from=haeundae&to=gwangalli';
+const INJECT = `.demo{display:none!important}
+.appbar{padding-top:calc(14px + ${SBH}px)!important}
+.dash{padding-top:${SBH}px!important}
+.dash::before{content:'';position:fixed;left:0;right:0;top:0;height:${SBH}px;background:#f4f7fa;z-index:60}
+html{scrollbar-width:none}::-webkit-scrollbar{display:none}
+*{caret-color:transparent!important}`;
+
+const ICONS = `<svg width="19" height="12" viewBox="0 0 19 12"><rect x="0" y="8" width="3.4" height="4" rx="1" fill="#111"/><rect x="5.1" y="5.5" width="3.4" height="6.5" rx="1" fill="#111"/><rect x="10.2" y="3" width="3.4" height="9" rx="1" fill="#111"/><rect x="15.3" y="0" width="3.4" height="12" rx="1" fill="#111"/></svg>
+<svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 11.6l2.6-2.7a3.7 3.7 0 0 0-5.2 0z" fill="#111"/><path d="M3.9 6.9a6.5 6.5 0 0 1 9.2 0l1.6-1.7a8.9 8.9 0 0 0-12.4 0z" fill="#111"/><path d="M0.9 3.9a10.7 10.7 0 0 1 15.2 0l1.6-1.7a13.1 13.1 0 0 0-18.4 0z" fill="#111" transform="translate(-0.35 0)"/></svg>
+<svg width="27" height="13" viewBox="0 0 27 13"><rect x="0.6" y="0.6" width="22.8" height="11.8" rx="3.6" fill="none" stroke="#111" stroke-opacity="0.45" stroke-width="1.2"/><rect x="2.4" y="2.4" width="19.2" height="8.2" rx="2.2" fill="#111"/><path d="M24.8 4.3v4.4c0.9-0.3 1.6-1.2 1.6-2.2s-0.7-1.9-1.6-2.2z" fill="#111" fill-opacity="0.45"/></svg>`;
+document.querySelectorAll('.sbar .ic').forEach((e) => (e.innerHTML = ICONS));
+
+const P = {
+  A: { ph: document.getElementById('phA'), ifr: document.getElementById('ifrA') },
+  B: { ph: document.getElementById('phB'), ifr: document.getElementById('ifrB') },
+};
+const W = (p) => p.ifr.contentWindow;
+const D = (p) => p.ifr.contentDocument;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const smooth = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+async function waitFor(fn, ms = 10000) {
+  const t0 = performance.now();
+  for (;;) {
+    try { const v = fn(); if (v) return v; } catch (e) {}
+    if (performance.now() - t0 > ms) throw new Error('waitFor timeout: ' + fn.toString());
+    await sleep(40);
+  }
+}
+function inject(p) { const d = D(p); const s = d.createElement('style'); s.textContent = INJECT; d.head.appendChild(s); }
+function load(p, url) {
+  return new Promise((res) => { p.ifr.onload = () => { inject(p); try { W(p).performance.setResourceTimingBufferSize(20000); } catch (e) {} res(); }; p.ifr.src = url; });
+}
+// real map: 'ready' once MapLibre has loaded, 'failed' if the app fell back to its schematic map
+function mapStateOf(p) {
+  const d = D(p);
+  if (d.querySelector('.map-note')) return 'failed';
+  if (d.querySelector('.map-loading')) return 'loading';
+  if (d.querySelector('.map-wrap.real')) return 'ready';
+  return 'none';
+}
+async function mapsReady(p, timeout = 60000) {
+  const t0 = performance.now();
+  for (;;) {
+    const s = mapStateOf(p);
+    if (s === 'failed') throw new Error('MAP_FALLBACK: the real map did not load');
+    if (s === 'ready') break;
+    if (performance.now() - t0 > timeout) throw new Error('MAP_TIMEOUT: map state ' + s);
+    await sleep(100);
+  }
+  // wait until tile, font and sprite requests have stopped for a while
+  let last = -1, since = performance.now();
+  const t1 = performance.now();
+  for (;;) {
+    const n = W(p).performance.getEntriesByType('resource').filter((e) => e.name.includes('openfreemap')).length;
+    if (n !== last) { last = n; since = performance.now(); }
+    if (performance.now() - since > 2000 && (n > 0 || performance.now() - t1 > 5000)) break;
+    if (performance.now() - t1 > timeout) break;
+    await sleep(100);
+  }
+  await sleep(1000);
+}
+window.mapState = () => mapStateOf(P.A);
+function setVal(p, el, v) {
+  const w = W(p);
+  const proto = el instanceof w.HTMLSelectElement ? w.HTMLSelectElement.prototype : w.HTMLInputElement.prototype;
+  Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, v);
+  el.dispatchEvent(new w.Event('input', { bubbles: true }));
+  el.dispatchEvent(new w.Event('change', { bubbles: true }));
+}
+// deepest element whose text starts with txt
+function textEl(p, txt, sel = '*') {
+  let best = null;
+  for (const e of D(p).querySelectorAll(sel)) if (e.textContent.trim().startsWith(txt)) best = e;
+  return best;
+}
+const card = (p, txt) => textEl(p, txt).closest('.card') || textEl(p, txt);
+const docTop = (p, el) => el.getBoundingClientRect().top + W(p).scrollY;
+const barH = (p) => { const a = D(p).querySelector('.appbar'); return a ? a.getBoundingClientRect().height : SBH; };
+const maxScroll = (p) => D(p).documentElement.scrollHeight - W(p).innerHeight;
+
+// ---------------------------------------------------------------- timeline
+const Q = [];
+const at = (t, fn) => Q.push({ t, fn });
+const scrolls = [], taps = [];
+function scrollAnim(p, t0, t1, target) {
+  at(t0, () => {
+    const y0 = W(p).scrollY;
+    const y1 = Math.max(0, Math.min(maxScroll(p), target()));
+    scrolls.push({ p, t0, t1, y0, y1 });
+  });
+}
+function tap(p, tt, find, click = true) {
+  at(tt - 0.38, () => {
+    const el = find();
+    const r = el.getBoundingClientRect(), f = p.ifr.getBoundingClientRect();
+    taps.push({ x: f.left + r.left + r.width / 2, y: f.top + r.top + r.height / 2, t: tt });
+  });
+  if (click) at(tt + 0.12, () => find().click());
+}
+const S = { pop: null, scanBox: null, code: null, timeA: '15:00', timeB: '19:38' };
+
+// B0 language picker (the app's own <select> opens a native list that a screenshot cannot show)
+at(0.52, () => {
+  const r = D(P.A).querySelector('.lang-pick select').getBoundingClientRect(), f = P.A.ifr.getBoundingClientRect();
+  taps.push({ x: f.left + r.left + r.width / 2, y: f.top + r.top + r.height / 2, t: 0.9 });
+  S.pop = { x: f.left + r.right - 200, y: f.top + r.bottom + 8 };
+});
+at(1.9, () => {
+  const e = document.getElementById('lpEn').getBoundingClientRect();
+  taps.push({ x: e.left + e.width / 2, y: e.top + e.height / 2, t: 2.28 });
+});
+// B1 flight number
+const flight = () => D(P.A).querySelector('input[placeholder="e.g. KE 1234"]');
+tap(P.A, 3.75, flight, false);
+at(3.75, () => flight().focus());
+'KE 1234'.split('').forEach((ch, i) => at(3.95 + i * 0.14, () => setVal(P.A, flight(), 'KE 1234'.slice(0, i + 1))));
+at(5.25, () => flight().blur());
+// B2 result card
+scrollAnim(P.A, 7.2, 8.5, () => docTop(P.A, D(P.A).querySelector('.card.airport')) - barH(P.A) - 10);
+scrollAnim(P.A, 9.8, 10.6, () => W(P.A).scrollY + 190);
+// B3 next day (under the wipe)
+at(11.85, async () => {
+  await load(P.A, URL_DAY2);
+  await waitFor(() => D(P.A).querySelector('.alt-item'));
+  await mapsReady(P.A);
+  await D(P.A).fonts.ready;
+  W(P.A).scrollTo(0, 0);
+  S.timeA = '19:30';
+  await sleep(250);
+});
+// B4 wait time
+scrollAnim(P.A, 13.5, 14.5, () => docTop(P.A, card(P.A, 'Pickup wait')) - barH(P.A) - 10);
+// B5 crowd at arrival + calmer spot
+scrollAnim(P.A, 17.75, 18.65, () => docTop(P.A, card(P.A, 'Calmer nearby')) - barH(P.A) - 150);
+tap(P.A, 20.45, () => D(P.A).querySelector('.alt-item button'));
+// B6 where to wait, then call
+scrollAnim(P.A, 22.95, 23.95, () => docTop(P.A, card(P.A, 'Wait here')) - barH(P.A) - 10);
+scrollAnim(P.A, 24.85, 25.45, () => maxScroll(P.A));
+tap(P.A, 26.0, () => [...D(P.A).querySelectorAll('button')].find((b) => b.textContent.includes('Call shuttle')));
+// B7 pay
+tap(P.A, 27.2, () => D(P.A).querySelectorAll('.pay-opt')[1]);
+tap(P.A, 28.45, () => D(P.A).querySelector('.sheet .btn-primary'));
+at(28.85, async () => {
+  await waitFor(() => D(P.A).querySelector('.qr-pass'));
+  W(P.A).scrollTo(0, 0);
+  await sleep(120);
+});
+// B8 QR boarding pass
+scrollAnim(P.A, 30.35, 31.1, () => docTop(P.A, D(P.A).querySelector('.qr-pass')) - barH(P.A) - 54);
+// driver phone, loaded off screen
+at(32.0, async () => {
+  const href = D(P.A).querySelector('.demo-link').getAttribute('href');
+  S.code = new URLSearchParams(href.split('?')[1]).get('c');
+  await load(P.B, '../docs/?lang=en&day=drone&t=1938' + href);
+  await waitFor(() => D(P.B).querySelector(`#pk-${S.code} button`));
+  await D(P.B).fonts.ready;
+  await sleep(300);
+  const li = D(P.B).querySelector(`#pk-${S.code}`);
+  W(P.B).scrollTo(0, Math.max(0, docTop(P.B, li) - 330));
+});
+// B9 boarding: scan on the tourist phone, verdict on the driver phone
+at(33.55, () => { S.timeA = '19:38'; });
+at(35.05, () => {
+  const q = D(P.A).querySelector('.qr-btn') || D(P.A).querySelector('.qr-pass svg');
+  const r = q.getBoundingClientRect(), f = P.A.ifr.getBoundingClientRect();
+  S.scanBox = { x: f.left + r.left, y: f.top + r.top, w: r.width, h: r.height };
+});
+at(36.5, () => D(P.B).querySelector(`#pk-${S.code} button`).click());
+at(36.55, async () => { await waitFor(() => D(P.B).querySelector('.greet')); await sleep(800); });
+scrollAnim(P.B, 36.6, 37.2, () => docTop(P.B, D(P.B).querySelector('.greet')) - SBH - 112);
+Q.sort((a, b) => a.t - b.t);
+
+// ---------------------------------------------------------------- captions
+const BEATS = [
+  { t0: 0.0, t1: 3.3, tone: 'amber', chip: 'DAY 1 · FRIDAY 15:00 · BEFORE THE FLIGHT', en: 'It opens in <em>my language</em> —<br>no app to install, no sign-up', ko: '앱 설치·회원가입 없이, 내 언어로 시작' },
+  { t0: 3.3, t1: 7.0, tone: 'amber', chip: 'DAY 1 · FRIDAY 15:00 · BEFORE THE FLIGHT', en: 'I book my <em>airport shuttle</em><br>before I fly', ko: '비행기 타기 전에 김해공항 셔틀을 예약' },
+  { t0: 7.0, t1: 11.45, tone: 'amber', chip: 'DAY 1 · LANDING AT GIMHAE 20:00', en: 'It tells me <em>when we leave</em> —<br>and when I reach my hotel', ko: '짐 찾고 20:25 출발 · 10번 중 9번은 21:22까지 숙소 도착' },
+  { t0: 12.6, t1: 17.6, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Off to Gwangalli —<br>I see <em>the wait</em> before I call', ko: '부르기 전에 대기시간을 확률로 · 10번 중 9번은 16분 안에 승차' },
+  { t0: 17.6, t1: 22.8, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'Gwangalli will be packed,<br>so it suggests <em>a calmer spot</em>', ko: '드론쇼 날 광안리는 혼잡 — 덜 붐비는 센텀시티를 추천' },
+  { t0: 22.8, t1: 26.4, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'It even shows<br><em>exactly where to wait</em>', ko: '타는 곳은 사진으로 안내' },
+  { t0: 26.4, t1: 30.2, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'I pay my own way —<br><em>charged only when I board</em>', ko: '해외 카드·간편결제 · 부를 때는 승인만, 탈 때 결제 확정' },
+  { t0: 30.2, t1: 33.6, tone: 'teal', chip: 'DAY 2 · SATURDAY 19:30 · HAEUNDAE', en: 'My <em>one-time QR</em><br>is the ticket', ko: '1회용 QR 탑승권이 바로 발급' },
+  { t0: 34.3, t1: DUR, tone: 'teal', chip: 'BOARDING · 19:38', narrow: true, en: 'The driver scans it — and the app <em>greets me in English</em>', ko: '기사 앱은 QR 확인 후 승객 언어로 인사' },
+];
+const cap = document.getElementById('cap');
+const chip = cap.querySelector('.chip'), chipTx = chip.querySelector('span'), h1 = cap.querySelector('h1'), ko = cap.querySelector('.ko');
+let shown = -1;
+function renderCaption(t) {
+  const i = BEATS.findIndex((b) => t >= b.t0 && t < b.t1);
+  if (i !== shown) {
+    shown = i;
+    if (i >= 0) {
+      const b = BEATS[i];
+      chipTx.textContent = b.chip;
+      chip.className = 'chip ' + b.tone;
+      cap.className = (b.tone === 'amber' ? 'amber' : '') + (b.narrow ? ' narrow' : '');
+      h1.innerHTML = b.en;
+      ko.textContent = b.ko;
+    }
+  }
+  if (i < 0) { cap.style.opacity = 0; return; }
+  const b = BEATS[i], prev = BEATS[i - 1], next = BEATS[i + 1];
+  const enter = b.t0 === 0 ? 1 : smooth((t - b.t0) / 0.35), exit = next ? smooth((b.t1 - t) / 0.24) : 1;
+  const textA = Math.min(enter, exit);
+  const chipIn = prev && prev.chip === b.chip && Math.abs(prev.t1 - b.t0) < 1e-6 ? 1 : enter;
+  const chipOut = next && next.chip === b.chip && Math.abs(next.t0 - b.t1) < 1e-6 ? 1 : exit;
+  cap.style.opacity = 1;
+  chip.style.opacity = Math.min(chipIn, chipOut);
+  h1.style.opacity = ko.style.opacity = textA;
+  h1.style.transform = `translateY(${(1 - enter) * 22}px)`;
+  ko.style.transform = `translateY(${b.t0 === 0 ? 0 : (1 - smooth((t - b.t0 - 0.08) / 0.35)) * 22}px)`;
+}
+
+// ---------------------------------------------------------------- per-frame render
+const tapLayer = document.getElementById('taps');
+function renderTaps(t) {
+  tapLayer.innerHTML = '';
+  for (const k of taps) {
+    const u = t - k.t;
+    if (u < -0.38 || u > 0.42) continue;
+    const dot = document.createElement('div');
+    dot.className = 'tap';
+    const appear = smooth((u + 0.38) / 0.22), leave = 1 - smooth((u - 0.12) / 0.24);
+    const press = u >= 0 && u < 0.14 ? 0.82 : 1;
+    const sc = (1.3 - 0.3 * appear) * press;
+    dot.style.cssText = `left:${k.x}px;top:${k.y}px;opacity:${Math.min(appear, leave)};transform:scale(${sc})`;
+    tapLayer.appendChild(dot);
+    if (u >= 0 && u < 0.4) {
+      const rp = document.createElement('div');
+      rp.className = 'ripple';
+      const R = 18 + 42 * smooth(u / 0.4);
+      rp.style.cssText = `left:${k.x - R}px;top:${k.y - R}px;width:${2 * R}px;height:${2 * R}px;opacity:${0.8 * (1 - u / 0.4)}`;
+      tapLayer.appendChild(rp);
+    }
+  }
+}
+const pop = document.getElementById('langpop');
+function renderPop(t) {
+  if (!S.pop || t < 0.95 || t > 2.62) { pop.style.opacity = 0; return; }
+  const a = Math.min(smooth((t - 0.95) / 0.16), 1 - smooth((t - 2.42) / 0.2));
+  pop.style.left = S.pop.x + 'px'; pop.style.top = S.pop.y + 'px';
+  pop.style.opacity = a; pop.style.transform = `scale(${0.92 + 0.08 * a})`;
+}
+const scan = document.getElementById('scan'), scanLn = scan.querySelector('.ln'), scanOk = scan.querySelector('.ok');
+function renderScan(t) {
+  if (!S.scanBox || t < 35.05 || t > 36.75) { scan.style.opacity = 0; return; }
+  const b = S.scanBox;
+  scan.style.left = b.x + 'px'; scan.style.top = b.y + 'px'; scan.style.width = b.w + 'px'; scan.style.height = b.h + 'px';
+  scan.style.opacity = Math.min(smooth((t - 35.05) / 0.15), 1 - smooth((t - 36.5) / 0.2));
+  const u = (t - 35.15) / 0.95;
+  const pos = u < 0 ? 0 : u > 1 ? 1 : (u < 0.5 ? u * 2 : 2 - u * 2);
+  scanLn.style.top = (pos * (b.h - 4)) + 'px';
+  scanLn.style.opacity = t < 36.1 ? 1 : 0;
+  scanOk.style.opacity = t >= 36.1 ? Math.min(1, smooth((t - 36.1) / 0.12)) : 0;
+  scanOk.style.transform = `scale(${t >= 36.1 ? 0.7 + 0.3 * smooth((t - 36.1) / 0.18) : 0.7})`;
+}
+const wipe = document.getElementById('wipe');
+function renderWipe(t) {
+  let x = -100;
+  if (t >= 11.45 && t < 11.8) x = -100 + 100 * ease((t - 11.45) / 0.35);
+  else if (t >= 11.8 && t < 12.25) x = 0;
+  else if (t >= 12.25 && t < 12.6) x = 100 * ease((t - 12.25) / 0.35);
+  else if (t >= 12.6) x = 100;
+  wipe.style.transform = `translateX(${x}%)`;
+}
+const lblA = document.getElementById('lblA'), lblB = document.getElementById('lblB');
+function renderLayout(t) {
+  // driver phone slides in for boarding
+  const m = ease((t - 33.6) / 0.8);
+  const ax = 200 - 90 * m, bx = 1760 - 1170 * m;
+  P.A.ph.style.left = ax + 'px'; P.B.ph.style.left = bx + 'px';
+  cap.style.left = (730 + 370 * m) + 'px';
+  cap.style.width = (860 - 340 * m) + 'px';
+  const la = t < 34.35 ? 0 : smooth((t - 34.35) / 0.35);
+  lblA.style.left = (ax + 212) + 'px'; lblB.style.left = (bx + 212) + 'px';
+  lblA.style.opacity = lblB.style.opacity = la;
+  P.A.ph.querySelector('.tm').textContent = S.timeA;
+  document.getElementById('prog').style.width = (100 * Math.min(1, (t + 1 / FPS) / DUR)) + '%';
+}
+function render(t) { renderLayout(t); renderCaption(t); renderTaps(t); renderPop(t); renderScan(t); renderWipe(t); }
+
+// ---------------------------------------------------------------- driver API
+async function init() {
+  await document.fonts.ready;
+  await load(P.A, URL_DAY1);
+  await waitFor(() => D(P.A).querySelector('input[placeholder="e.g. KE 1234"]'));
+  setVal(P.A, D(P.A).querySelector('input[type=time]'), '20:00');
+  setVal(P.A, D(P.A).querySelectorAll('select')[1], 'haeundae');
+  D(P.A).activeElement && D(P.A).activeElement.blur();
+  await mapsReady(P.A);
+  await D(P.A).fonts.ready;
+  W(P.A).scrollTo(0, 0);
+  await sleep(300);
+  render(0);
+  return 'ready';
+}
+async function tick(f) {
+  const t = f / FPS;
+  while (Q.length && Q[0].t <= t + 1e-9) { const a = Q.shift(); await a.fn(); }
+  for (const s of scrolls) {
+    if (s.done || t < s.t0 - 1e-9) continue;
+    const k = Math.min(1, (t - s.t0) / (s.t1 - s.t0));
+    W(s.p).scrollTo(0, s.y0 + (s.y1 - s.y0) * ease(k));
+    if (k >= 1) s.done = true;
+  }
+  for (const e of [document.documentElement, document.body, document.getElementById('stage'), ...document.querySelectorAll('.phone .scr')]) { e.scrollLeft = 0; e.scrollTop = 0; }
+  render(t);
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  return t;
+}
+window.init = init; window.tick = tick;
+</script>
+</body>
+</html>
